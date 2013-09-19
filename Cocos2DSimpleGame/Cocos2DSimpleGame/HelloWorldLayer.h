@@ -20,6 +20,7 @@
     NSMutableArray * _projectiles;
     int _monstersDestroyed;
     int _monstersInLevel;
+    float _lifeUpProbability;
     NSArray* _monstersPerLevel;
     CCLabelTTF * _enemyCountLabel;
     CCLabelTTF * _levelLabel;

@@ -120,8 +120,10 @@
 
 -(void)gameLogic:(ccTime)dt {
     [self addMonster];
-    [self addLifeBonus];
-    
+    float random = arc4random_uniform(100)/100.0;
+    if (random < _lifeUpProbability) {
+        [self addLifeBonus];
+    }
 }
  
 - (id) init
@@ -143,6 +145,8 @@
         _projectiles = [[NSMutableArray alloc] init];
         _lifeUps = [[NSMutableArray alloc] init];
         
+        _lifeUpProbability = 0.1;
+
         int level = [LevelManager sharedManager].level;
         _monstersInLevel = [_monstersPerLevel[level] intValue];
 
@@ -167,11 +171,14 @@
         _heartSprites = [NSArray arrayWithObjects:[CCSprite spriteWithFile:@"heart.png"],[CCSprite spriteWithFile:@"heart.png"],[CCSprite spriteWithFile:@"heart.png"], nil];
         int i = 1;
         for (CCSprite* heartSprite in _heartSprites) {
+            if (i - 1 >= [LevelManager sharedManager].lives) {
+                [heartSprite setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
+            }
             heartSprite.position = ccp(winSize.width/2  - heartSprite.contentSize.width*i++, winSize.height - heartSprite.contentSize.height/2);
             [self addChild:heartSprite];
         }
         
-        
+        [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", [LevelManager sharedManager].lives]];
         
         [self schedule:@selector(update:)];
         
