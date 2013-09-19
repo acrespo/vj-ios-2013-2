@@ -28,6 +28,7 @@
         } else {
             message = @"You Lose :[";
             [LevelManager sharedManager].level = 0;
+            [LevelManager sharedManager].lives = 3;
         }
 
         CGSize winSize = [[CCDirector sharedDirector] winSize];

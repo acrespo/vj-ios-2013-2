@@ -87,19 +87,19 @@
 
     CCSprite * lifeUp = [CCSprite spriteWithFile:@"heart.png"];
     
-    // Determine where to spawn the monster along the Y axis
+    // Determine where to spawn the lifeup along the Y axis
     CGSize winSize = [CCDirector sharedDirector].winSize;
     int minY = lifeUp.contentSize.height / 2;
     int maxY = winSize.height - lifeUp.contentSize.height/2;
     int rangeY = maxY - minY;
     int actualY = (arc4random() % rangeY) + minY;
     
-    // Create the monster slightly off-screen along the right edge,
+    // Create the lifeup sprite slightly off-screen along the right edge,
     // and along a random position along the Y axis as calculated above
     lifeUp.position = ccp(winSize.width + lifeUp.contentSize.width/2, actualY);
     [self addChild:lifeUp];
     
-    // Determine speed of the monster
+    // Determine speed of the life bonus
     int minDuration = 2.0;
     int maxDuration = 4.0;
     int rangeDuration = maxDuration - minDuration;
@@ -113,7 +113,7 @@
     }];
     [lifeUp runAction:[CCSequence actions:actionMove, actionMoveDone, nil]];
     
-    lifeUp.tag = 1;
+    lifeUp.tag = 2;
     [_lifeUps addObject:lifeUp];
     
 }
@@ -141,6 +141,7 @@
         
         _monsters = [[NSMutableArray alloc] init];
         _projectiles = [[NSMutableArray alloc] init];
+        _lifeUps = [[NSMutableArray alloc] init];
         
         int level = [LevelManager sharedManager].level;
         _monstersInLevel = [_monstersPerLevel[level] intValue];
@@ -269,13 +270,18 @@
         }
         
         for (CCSprite *life in livesToDelete) {
-            [_monsters removeObject:life];
+            [_lifeUps removeObject:life];
             [self removeChild:life cleanup:YES];
-            [LevelManager sharedManager].lives++;
+            if ([LevelManager sharedManager].lives < 3) {
+                [_heartSprites[[LevelManager sharedManager].lives] setTexture:[[CCSprite spriteWithFile:@"heart.png"] texture]];
+                [LevelManager sharedManager].lives++;
+                [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", [LevelManager sharedManager].lives]];
+                
+            }
         }
         
         
-        if (monstersToDelete.count > 0) {
+        if (monstersToDelete.count > 0 || livesToDelete.count > 0) {
             [projectilesToDelete addObject:projectile];
         }
     }
@@ -292,6 +298,7 @@
 {
     _monsters = nil;
     _projectiles = nil;
+    _lifeUps = nil;
 }
 
 #pragma mark GameKit delegate
