@@ -73,8 +73,6 @@
             [_heartSprites[[LevelManager sharedManager].lives] setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
             [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", [LevelManager sharedManager].lives]];
         }
-        
-
     }];
     [monster runAction:[CCSequence actions:actionMove, actionMoveDone, nil]];
     
@@ -146,6 +144,7 @@
         _lifeUps = [[NSMutableArray alloc] init];
         
         _lifeUpProbability = 0.1;
+        _comboCounter = 0;
 
         int level = [LevelManager sharedManager].level;
         _monstersInLevel = [_monstersPerLevel[level] intValue];
@@ -167,6 +166,12 @@
         _livesLabel.color = ccc3(0,0,0);
         _livesLabel.position = ccp(winSize.width/2 + _livesLabel.contentSize.width/2, winSize.height - _livesLabel.contentSize.height/2);
         [self addChild:_livesLabel];
+
+        NSString* comboMessage = [NSString stringWithFormat: @"Combo: x%d", _comboCounter];
+        _comboLabel = [CCLabelTTF labelWithString:comboMessage fontName:@"Arial" fontSize:12];
+        _comboLabel.color = ccc3(0,0,0);
+        _comboLabel.position = ccp(winSize.width/2 + _comboLabel.contentSize.width, winSize.height - _comboLabel.contentSize.height*2);
+        [self addChild:_comboLabel];
         
         _heartSprites = [NSArray arrayWithObjects:[CCSprite spriteWithFile:@"heart.png"],[CCSprite spriteWithFile:@"heart.png"],[CCSprite spriteWithFile:@"heart.png"], nil];
         int i = 1;
@@ -227,6 +232,8 @@
       [CCMoveTo actionWithDuration:realMoveDuration position:realDest],
       [CCCallBlockN actionWithBlock:^(CCNode *node) {
          [_projectiles removeObject:node];
+         _comboCounter = 0;
+         [_comboLabel setString:[NSString stringWithFormat: @"Combo: x%d", _comboCounter]];
          [node removeFromParentAndCleanup:YES];
     }],
       nil]];
@@ -256,6 +263,8 @@
             
             _monstersDestroyed++;
             [_enemyCountLabel setString: [NSString stringWithFormat: @"Enemies killed %d/%d", _monstersDestroyed, _monstersInLevel]];
+            _comboCounter++;
+            [_comboLabel setString:[NSString stringWithFormat: @"Combo: x%d", _comboCounter]];
             if (_monstersDestroyed >= _monstersInLevel) {
                 int level = ++[LevelManager sharedManager].level;
                 if (level >= 3) {
