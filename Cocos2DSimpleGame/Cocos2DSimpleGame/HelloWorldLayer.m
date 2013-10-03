@@ -127,9 +127,9 @@
     if ((self = [super initWithColor:ccc4(255,255,255,255)])) {
 
         winSize = [CCDirector sharedDirector].winSize;
-        CCSprite *player = [CCSprite spriteWithFile:@"player.png"];
-        player.position = ccp(player.contentSize.width/2, winSize.height/2);
-        [self addChild:player];
+        _player = [CCSprite spriteWithFile:@"player.png"];
+        _player.position = ccp(_player.contentSize.width/2, winSize.height/2);
+        [self addChild:_player];
         
         [self schedule:@selector(gameLogic:) interval:1.0];
         
@@ -228,38 +228,55 @@
 
 - (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     
+    if (_nextProjectile != nil) return;
+    
     // Choose one of the touches to work with
     UITouch *touch = [touches anyObject];
     CGPoint location = [self convertTouchToNodeSpace:touch];
     
     // Set up initial location of projectile
-    CCSprite *projectile = [CCSprite spriteWithFile:@"projectile.png"
-                                               rect:CGRectMake(0, 0, 20, 20)];
-    projectile.position = ccp(20, winSize.height/2);
+    _nextProjectile = [CCSprite spriteWithFile:@"projectile.png" rect:CGRectMake(0, 0, 20, 20)];
+    _nextProjectile.position = ccp(20, winSize.height/2);
     
     // Determine offset of location to projectile
-    CGPoint offset = ccpSub(location, projectile.position);
+    CGPoint offset = ccpSub(location, _nextProjectile.position);
     
     // Bail out if you are shooting down or backwards
     if (offset.x <= 0) return;
     
-    // Ok to add now - we've double checked position
-    [self addChild:projectile];
-    
-    int realX = winSize.width + (projectile.contentSize.width/2);
+    int realX = winSize.width + (_nextProjectile.contentSize.width/2);
     float ratio = (float) offset.y / (float) offset.x;
-    int realY = (realX * ratio) + projectile.position.y;
+    int realY = (realX * ratio) + _nextProjectile.position.y;
     CGPoint realDest = ccp(realX, realY);
     
     // Determine the length of how far you're shooting
-    int offRealX = realX - projectile.position.x;
-    int offRealY = realY - projectile.position.y;
+    int offRealX = realX - _nextProjectile.position.x;
+    int offRealY = realY - _nextProjectile.position.y;
     float length = sqrtf((offRealX*offRealX)+(offRealY*offRealY));
     float velocity = 480/1; // 480pixels/1sec
     float realMoveDuration = length/velocity;
     
+    // Determine angle to face
+    float angleRadians = atanf((float)offRealY / (float)offRealX);
+    float angleDegrees = CC_RADIANS_TO_DEGREES(angleRadians);
+    float cocosAngle = -1 * angleDegrees;
+    float rotateDegreesPerSecond = 180 / 0.3; // Would take 0.5 seconds to rotate 180 degrees, or half a circle
+    float degreesDiff = _player.rotation - cocosAngle;
+    float rotateDuration = fabs(degreesDiff / rotateDegreesPerSecond);
+    [_player runAction:
+     [CCSequence actions:
+      [CCRotateTo actionWithDuration:rotateDuration angle:cocosAngle],
+      [CCCallBlock actionWithBlock:^{
+         // OK to add now - rotation is finished!
+         [self addChild:_nextProjectile];
+         [_projectiles addObject:_nextProjectile];
+         // Release
+         _nextProjectile = nil;
+     }],
+      nil]];
+    
     // Move projectile to actual endpoint
-    [projectile runAction:
+    [_nextProjectile runAction:
      [CCSequence actions:
       [CCMoveTo actionWithDuration:realMoveDuration position:realDest],
       [CCCallBlockN actionWithBlock:^(CCNode *node) {
@@ -270,8 +287,8 @@
     }],
       nil]];
     
-    projectile.tag = 2;
-    [_projectiles addObject:projectile];
+    _nextProjectile.tag = 2;
+    [_projectiles addObject:_nextProjectile];
     
     [[SimpleAudioEngine sharedEngine] playEffect:@"pew-pew-lei.caf"];
 }

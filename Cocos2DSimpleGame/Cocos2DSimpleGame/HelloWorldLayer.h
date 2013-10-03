@@ -30,6 +30,8 @@
     CCLabelTTF * _pauseLabel;
     CCMenuItem * _starMenuItem;
     CGSize winSize;
+    CCSprite *_player;
+    CCSprite *_nextProjectile;
 
 }
 @property int level;
