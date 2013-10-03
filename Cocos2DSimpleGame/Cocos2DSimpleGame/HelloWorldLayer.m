@@ -42,7 +42,6 @@
     CCSprite * monster = [CCSprite spriteWithFile:@"monster.png"];
     
     // Determine where to spawn the monster along the Y axis
-    CGSize winSize = [CCDirector sharedDirector].winSize;
     int minY = monster.contentSize.height / 2;
     int maxY = winSize.height - monster.contentSize.height/2;
     int rangeY = maxY - minY;
@@ -86,7 +85,6 @@
     CCSprite * lifeUp = [CCSprite spriteWithFile:@"heart.png"];
     
     // Determine where to spawn the lifeup along the Y axis
-    CGSize winSize = [CCDirector sharedDirector].winSize;
     int minY = lifeUp.contentSize.height / 2;
     int maxY = winSize.height - lifeUp.contentSize.height/2;
     int rangeY = maxY - minY;
@@ -128,7 +126,7 @@
 {
     if ((self = [super initWithColor:ccc4(255,255,255,255)])) {
 
-        CGSize winSize = [CCDirector sharedDirector].winSize;
+        winSize = [CCDirector sharedDirector].winSize;
         CCSprite *player = [CCSprite spriteWithFile:@"player.png"];
         player.position = ccp(player.contentSize.width/2, winSize.height/2);
         [self addChild:player];
@@ -214,6 +212,7 @@
 
 - (void)unpauseButtonTapped:(id)sender {
     [_pauseLabel setString:@"Pause"];
+    [_pauseLabel setPosition:ccp(winSize.width - _starMenuItem.contentSize.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
     [CCDirector sharedDirector].scheduler.timeScale = 1;
     [_starMenuItem setTarget:self selector:@selector(pauseButtonTapped:)];
 }
@@ -221,6 +220,7 @@
 
 - (void)pauseButtonTapped:(id)sender {
     [_pauseLabel setString:@"Resume"];
+    [_pauseLabel setPosition:ccp(winSize.width - _starMenuItem.contentSize.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
     [CCDirector sharedDirector].scheduler.timeScale = 0;
     [_starMenuItem setTarget:self selector:@selector(unpauseButtonTapped:)];
 
@@ -233,7 +233,6 @@
     CGPoint location = [self convertTouchToNodeSpace:touch];
     
     // Set up initial location of projectile
-    CGSize winSize = [[CCDirector sharedDirector] winSize];
     CCSprite *projectile = [CCSprite spriteWithFile:@"projectile.png"
                                                rect:CGRectMake(0, 0, 20, 20)];
     projectile.position = ccp(20, winSize.height/2);

@@ -20,7 +20,6 @@
     NSMutableArray * _projectiles;
     NSArray* _heartSprites;
     NSArray* _monstersPerLevel;
-
     int _monstersDestroyed;
     int _monstersInLevel;
     float _lifeUpProbability;
@@ -30,6 +29,7 @@
     CCLabelTTF * _comboLabel;
     CCLabelTTF * _pauseLabel;
     CCMenuItem * _starMenuItem;
+    CGSize winSize;
 
 }
 @property int level;
