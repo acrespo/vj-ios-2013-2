@@ -12,23 +12,30 @@
 
 @implementation GameOverLayer
 
-+(CCScene *) sceneWithWon:(BOOL)won {
++(CCScene *) sceneWithWon:(BOOL)won caller:(CCLayerColor*)callerLayer {
     CCScene *scene = [CCScene node];
-    GameOverLayer *layer = [[GameOverLayer alloc] initWithWon:won];
+    GameOverLayer *layer = [[GameOverLayer alloc] initWithWon:won caller:callerLayer];
     [scene addChild: layer];
     return scene;
 }
 
-- (id)initWithWon:(BOOL)won {
-    if ((self = [super initWithColor:ccc4(255, 255, 255, 255)])) {
+- (id)initWithWon:(BOOL)won caller:(CCLayerColor*) callerLayer {
+    
+ 
+    if ((self = [super initWithColor:ccc4(255, 255, 255, 255)]) && [callerLayer isMemberOfClass:[HelloWorldLayer class]]) {
         
+        _callerLayer = callerLayer;
         NSString * message;
         if (won) {
             message = @"You Won!";
+            [LevelManager sharedManager].level = ((HelloWorldLayer*)_callerLayer).level;
+            [LevelManager sharedManager].lives = ((HelloWorldLayer*)_callerLayer).lives;
+            [LevelManager sharedManager].comboCounter = ((HelloWorldLayer*)_callerLayer).comboCounter;
         } else {
             message = @"You Lose :[";
             [LevelManager sharedManager].level = 0;
             [LevelManager sharedManager].lives = 3;
+            [LevelManager sharedManager].comboCounter = 0;
         }
 
         CGSize winSize = [[CCDirector sharedDirector] winSize];

@@ -67,7 +67,7 @@
         
         _lives--;
         if (_lives < 0) {
-            CCScene *gameOverScene = [GameOverLayer sceneWithWon:NO];
+            CCScene *gameOverScene = [GameOverLayer sceneWithWon:NO caller:self];
             [[CCDirector sharedDirector] replaceScene:gameOverScene];
         } else {
             [_heartSprites[_lives] setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
@@ -304,7 +304,7 @@
                     _level = 0;
                 }
                 
-                CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES];
+                CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES caller:self];
                 [[CCDirector sharedDirector] replaceScene:gameOverScene];
             }
         }

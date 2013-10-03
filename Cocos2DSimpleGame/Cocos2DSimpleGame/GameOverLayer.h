@@ -9,8 +9,11 @@
 #import "cocos2d.h"
 
 @interface GameOverLayer : CCLayerColor
+{
+    CCLayerColor* _callerLayer;
+}
 
-+(CCScene *) sceneWithWon:(BOOL)won;
-- (id)initWithWon:(BOOL)won;
++(CCScene *) sceneWithWon:(BOOL)won caller:(CCLayerColor*)caller;
+- (id)initWithWon:(BOOL)won caller:(CCLayerColor*)callerLayer;
 
 @end
