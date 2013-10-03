@@ -12,6 +12,7 @@
 #import "SimpleAudioEngine.h"
 #import "GameOverLayer.h"
 #import "LevelManager.h"
+#import "Monster.h"
 
 // Needed to obtain the Navigation Controller
 #import "AppDelegate.h"
@@ -39,8 +40,14 @@
 
 - (void) addMonster {
     
-    CCSprite * monster = [CCSprite spriteWithFile:@"monster.png"];
-    
+    //CCSprite * monster = [CCSprite spriteWithFile:@"monster.png"];
+    Monster * monster = nil;
+    if (arc4random() % 4 == 0) {
+        monster = [[StrongAndSlowMonster alloc] init];
+    } else {
+        monster = [[WeakAndFastMonster alloc] init];
+    }
+
     // Determine where to spawn the monster along the Y axis
     int minY = monster.contentSize.height / 2;
     int maxY = winSize.height - monster.contentSize.height/2;
@@ -53,8 +60,8 @@
     [self addChild:monster];
     
     // Determine speed of the monster
-    int minDuration = 2.0;
-    int maxDuration = 4.0;
+    int minDuration = monster.minMoveDuration; //2.0;
+    int maxDuration = monster.maxMoveDuration; //4.0;
     int rangeDuration = maxDuration - minDuration;
     int actualDuration = (arc4random() % rangeDuration) + minDuration;
     
@@ -205,6 +212,8 @@
         [self schedule:@selector(update:)];
         
         [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"background-music-aac.caf"];
+        _backgroundMusicVolume = [SimpleAudioEngine sharedEngine].backgroundMusicVolume;
+        [SimpleAudioEngine sharedEngine].backgroundMusicVolume = _backgroundMusicVolume/5.0;
         
     }
     return self;
@@ -298,15 +307,22 @@
     NSMutableArray *projectilesToDelete = [[NSMutableArray alloc] init];
     for (CCSprite *projectile in _projectiles) {
         
+        BOOL monsterHit = FALSE;
         NSMutableArray *monstersToDelete = [[NSMutableArray alloc] init];
-        for (CCSprite *monster in _monsters) {
+        for (Monster *monster in _monsters) {
             
             if (CGRectIntersectsRect(projectile.boundingBox, monster.boundingBox)) {
-                [monstersToDelete addObject:monster];
+                monsterHit = TRUE;
+                monster.hp--;
+                if (monster.hp <= 0) {
+                    [monstersToDelete addObject:monster];
+                    [[SimpleAudioEngine sharedEngine] playEffect:@"3b0817_New_Super_Mario_Bros_Firework_Sound_Effect.mp3"];
+                }
+                break;
             }
         }
                 
-        for (CCSprite *monster in monstersToDelete) {
+        for (Monster *monster in monstersToDelete) {
             [_monsters removeObject:monster];
             [self removeChild:monster cleanup:YES];
             
@@ -345,9 +361,11 @@
             }
         }
         
-        
-        if (monstersToDelete.count > 0 || livesToDelete.count > 0) {
+        if (monsterHit) {
             [projectilesToDelete addObject:projectile];
+        } else if (livesToDelete.count > 0) {
+            [projectilesToDelete addObject:projectile];
+            [[SimpleAudioEngine sharedEngine] playEffect:@"3fc83f_Super_Mario_Bros_1_Up_Sound_Effect.mp3"];
         }
     }
     

@@ -32,6 +32,7 @@
     CGSize winSize;
     CCSprite *_player;
     CCSprite *_nextProjectile;
+    int _backgroundMusicVolume;
 
 }
 @property int level;
