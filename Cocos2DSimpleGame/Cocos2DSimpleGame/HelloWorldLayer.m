@@ -65,13 +65,13 @@
         [_monsters removeObject:node];
         [node removeFromParentAndCleanup:YES];
         
-        [LevelManager sharedManager].lives--;
-        if ([LevelManager sharedManager].lives < 0) {
+        _lives--;
+        if (_lives < 0) {
             CCScene *gameOverScene = [GameOverLayer sceneWithWon:NO];
             [[CCDirector sharedDirector] replaceScene:gameOverScene];
         } else {
-            [_heartSprites[[LevelManager sharedManager].lives] setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
-            [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", [LevelManager sharedManager].lives]];
+            [_heartSprites[_lives] setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
+            [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", _lives]];
         }
     }];
     [monster runAction:[CCSequence actions:actionMove, actionMoveDone, nil]];
@@ -144,10 +144,10 @@
         _lifeUps = [[NSMutableArray alloc] init];
         
         _lifeUpProbability = 0.1;
-        _comboCounter = 0;
-
-        int level = [LevelManager sharedManager].level;
-        _monstersInLevel = [_monstersPerLevel[level] intValue];
+        _comboCounter = [LevelManager sharedManager].comboCounter;
+        _lives = [LevelManager sharedManager].lives;
+        _level = [LevelManager sharedManager].level;
+        _monstersInLevel = [_monstersPerLevel[_level] intValue];
 
         NSString* enemyCountMessage = [NSString stringWithFormat: @"Enemies killed %d/%d", _monstersDestroyed, _monstersInLevel];
         _enemyCountLabel = [CCLabelTTF labelWithString:enemyCountMessage fontName:@"Arial" fontSize:28];
@@ -155,17 +155,36 @@
         _enemyCountLabel.position = ccp(winSize.width/2, winSize.height/2);
         [self addChild:_enemyCountLabel];
         
-        NSString* levelMessage = [NSString stringWithFormat: @"Level %d", level];
+        NSString* levelMessage = [NSString stringWithFormat: @"Level %d", _level];
         _levelLabel = [CCLabelTTF labelWithString:levelMessage fontName:@"Arial" fontSize:28];
         _levelLabel.color = ccc3(0,0,0);
         _levelLabel.position = ccp(winSize.width - _levelLabel.contentSize.width, winSize.height - _levelLabel.contentSize.height/2);
         [self addChild:_levelLabel];
         
-        NSString* livesMessage = [NSString stringWithFormat: @"Lives %d", level];
+        NSString* livesMessage = [NSString stringWithFormat: @"Lives %d", _level];
         _livesLabel = [CCLabelTTF labelWithString:livesMessage fontName:@"Arial" fontSize:28];
         _livesLabel.color = ccc3(0,0,0);
         _livesLabel.position = ccp(winSize.width/2 + _livesLabel.contentSize.width/2, winSize.height - _livesLabel.contentSize.height/2);
         [self addChild:_livesLabel];
+        
+        
+        // Standard method to create a button
+        _starMenuItem = [CCMenuItemImage
+                                    itemWithNormalImage:@"ButtonStar.png" selectedImage:@"ButtonStarSel.png"
+                                    target:self selector:@selector(pauseButtonTapped:)];
+        _starMenuItem.position = ccp(winSize.width-_starMenuItem.contentSize.width/2, _starMenuItem.contentSize.height/2);
+        CCMenu *starMenu = [CCMenu menuWithItems:_starMenuItem, nil];
+        starMenu.position = CGPointZero;
+        [self addChild:starMenu];
+        
+        NSString* pauseMenuMessage = [NSString stringWithFormat: @"Pause"];
+        _pauseLabel = [CCLabelTTF labelWithString:pauseMenuMessage fontName:@"Arial" fontSize:28];
+        _pauseLabel.color = ccc3(0,0,0);
+        _pauseLabel.position = ccp(winSize.width - _starMenuItem.contentSize.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2);
+        [self addChild:_pauseLabel];
+        
+
+        
 
         NSString* comboMessage = [NSString stringWithFormat: @"Combo: x%d", _comboCounter];
         _comboLabel = [CCLabelTTF labelWithString:comboMessage fontName:@"Arial" fontSize:12];
@@ -176,14 +195,14 @@
         _heartSprites = [NSArray arrayWithObjects:[CCSprite spriteWithFile:@"heart.png"],[CCSprite spriteWithFile:@"heart.png"],[CCSprite spriteWithFile:@"heart.png"], nil];
         int i = 1;
         for (CCSprite* heartSprite in _heartSprites) {
-            if (i - 1 >= [LevelManager sharedManager].lives) {
+            if (i - 1 >= _lives) {
                 [heartSprite setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
             }
             heartSprite.position = ccp(winSize.width/2  - heartSprite.contentSize.width*i++, winSize.height - heartSprite.contentSize.height/2);
             [self addChild:heartSprite];
         }
         
-        [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", [LevelManager sharedManager].lives]];
+        [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", _lives]];
         
         [self schedule:@selector(update:)];
         
@@ -191,6 +210,20 @@
         
     }
     return self;
+}
+
+- (void)unpauseButtonTapped:(id)sender {
+    [_pauseLabel setString:@"Pause"];
+    [CCDirector sharedDirector].scheduler.timeScale = 1;
+    [_starMenuItem setTarget:self selector:@selector(pauseButtonTapped:)];
+}
+
+
+- (void)pauseButtonTapped:(id)sender {
+    [_pauseLabel setString:@"Resume"];
+    [CCDirector sharedDirector].scheduler.timeScale = 0;
+    [_starMenuItem setTarget:self selector:@selector(unpauseButtonTapped:)];
+
 }
 
 - (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -266,9 +299,9 @@
             _comboCounter++;
             [_comboLabel setString:[NSString stringWithFormat: @"Combo: x%d", _comboCounter]];
             if (_monstersDestroyed >= _monstersInLevel) {
-                int level = ++[LevelManager sharedManager].level;
+                int level = ++_level;
                 if (level >= 3) {
-                    [LevelManager sharedManager].level = 0;
+                    _level = 0;
                 }
                 
                 CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES];
@@ -288,10 +321,10 @@
         for (CCSprite *life in livesToDelete) {
             [_lifeUps removeObject:life];
             [self removeChild:life cleanup:YES];
-            if ([LevelManager sharedManager].lives < 3) {
-                [_heartSprites[[LevelManager sharedManager].lives] setTexture:[[CCSprite spriteWithFile:@"heart.png"] texture]];
-                [LevelManager sharedManager].lives++;
-                [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", [LevelManager sharedManager].lives]];
+            if (_lives < 3) {
+                [_heartSprites[_lives] setTexture:[[CCSprite spriteWithFile:@"heart.png"] texture]];
+                _lives++;
+                [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", _lives]];
                 
             }
         }

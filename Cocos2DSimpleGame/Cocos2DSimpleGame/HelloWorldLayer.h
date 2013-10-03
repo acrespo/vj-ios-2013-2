@@ -20,6 +20,8 @@
     NSMutableArray * _projectiles;
     NSArray* _heartSprites;
     NSArray* _monstersPerLevel;
+    int _level;
+    int _lives;
     int _monstersDestroyed;
     int _monstersInLevel;
     float _lifeUpProbability;
@@ -28,10 +30,11 @@
     CCLabelTTF * _levelLabel;
     CCLabelTTF * _livesLabel;
     CCLabelTTF * _comboLabel;
+    CCLabelTTF * _pauseLabel;
+    CCMenuItem * _starMenuItem;
 
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child
 +(CCScene *) scene;
-
 @end

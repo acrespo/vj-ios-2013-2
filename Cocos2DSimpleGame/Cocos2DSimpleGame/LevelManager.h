@@ -12,6 +12,7 @@
 
 @property int level;
 @property int lives;
+@property int comboCounter;
 
 + (LevelManager*)sharedManager;
 

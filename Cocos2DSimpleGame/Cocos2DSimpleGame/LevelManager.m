@@ -23,6 +23,7 @@
     if (self = [super init]) {
         _level = 0;
         _lives = 3;
+        _comboCounter = 0;
     }
     return self;
 }
