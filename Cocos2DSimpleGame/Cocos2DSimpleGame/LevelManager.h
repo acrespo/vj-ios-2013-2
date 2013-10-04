@@ -11,7 +11,7 @@
 
 @interface LevelManager : NSObject
 
-@property int level;
+@property int levelNum;
 @property NSArray * levels;
 @property int lives;
 @property int comboCounter;

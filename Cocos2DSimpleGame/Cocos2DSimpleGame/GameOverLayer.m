@@ -27,15 +27,15 @@
         _callerLayer = callerLayer;
         NSString * message;
         if (won) {
-            [LevelManager sharedManager].level++;
+            [LevelManager sharedManager].levelNum++;
             Level * curLevel = [[LevelManager sharedManager] curLevel];
             if (curLevel) {
                 message = [NSString stringWithFormat:@"Get ready for level %d!", curLevel.levelNum];
-                [LevelManager sharedManager].level = ((HelloWorldLayer*)_callerLayer).level;
                 [LevelManager sharedManager].lives = ((HelloWorldLayer*)_callerLayer).lives;
                 [LevelManager sharedManager].comboCounter = ((HelloWorldLayer*)_callerLayer).comboCounter;
             } else {
                 message = @"You Won!";
+                [[LevelManager sharedManager] reset];
             }
         } else {
             message = @"You Lose :[";

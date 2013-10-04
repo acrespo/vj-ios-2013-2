@@ -21,7 +21,7 @@
 
 - (id)init {
     if (self = [super init]) {
-        _level = 0;
+        _levelNum = 0;
         _lives = 3;
         _comboCounter = 0;
         Level * level1 = [[Level alloc] initWithLevelNum:1 enemiesNum:5 secsPerSpawn:2 backgroundColor:ccc4(255, 255, 255, 255)];
@@ -33,14 +33,14 @@
 }
 
 - (Level *)curLevel {
-    if (_level >= _levels.count) {
+    if (_levelNum >= _levels.count) {
         return nil;
     }
-    return _levels[_level];
+    return _levels[_levelNum];
 }
 
 - (void)reset {
-    _level = 0;
+    _levelNum = 0;
     _lives = 3;
     _comboCounter = 0;
 }
