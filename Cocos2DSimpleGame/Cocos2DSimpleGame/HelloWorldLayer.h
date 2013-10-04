@@ -11,6 +11,7 @@
 
 // When you import this file, you import all the cocos2d classes
 #import "cocos2d.h"
+#import "Level.h"
 
 // HelloWorldLayer
 @interface HelloWorldLayer : CCLayerColor
@@ -19,7 +20,6 @@
     NSMutableArray * _lifeUps;
     NSMutableArray * _projectiles;
     NSArray* _heartSprites;
-    NSArray* _monstersPerLevel;
     int _monstersDestroyed;
     int _monstersInLevel;
     float _lifeUpProbability;
@@ -35,7 +35,7 @@
     int _backgroundMusicVolume;
 
 }
-@property int level;
+@property Level* level;
 @property int lives;
 @property int comboCounter;
 

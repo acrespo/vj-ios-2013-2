@@ -13,6 +13,7 @@
 #import "GameOverLayer.h"
 #import "LevelManager.h"
 #import "Monster.h"
+#import "Level.h"
 
 // Needed to obtain the Navigation Controller
 #import "AppDelegate.h"
@@ -123,7 +124,8 @@
 
 -(void)gameLogic:(ccTime)dt {
     [self addMonster];
-    float random = arc4random_uniform(100)/100.0;
+    float secsPerSpawn = [LevelManager sharedManager].curLevel.secsPerSpawn;
+    float random = arc4random_uniform(100*secsPerSpawn)/(100.0*secsPerSpawn);
     if (random < _lifeUpProbability) {
         [self addLifeBonus];
     }
@@ -131,19 +133,17 @@
  
 - (id) init
 {
-    if ((self = [super initWithColor:ccc4(255,255,255,255)])) {
+    if ((self = [super initWithColor:[LevelManager sharedManager].curLevel.backgroundColor])) {
 
         winSize = [CCDirector sharedDirector].winSize;
         _player = [CCSprite spriteWithFile:@"player.png"];
         _player.position = ccp(_player.contentSize.width/2, winSize.height/2);
         [self addChild:_player];
         
-        [self schedule:@selector(gameLogic:) interval:1.0];
+        [self schedule:@selector(gameLogic:) interval:[LevelManager sharedManager].curLevel.secsPerSpawn];
         
         [self setTouchEnabled:YES];
-        
-         _monstersPerLevel = [NSArray arrayWithObjects:@(10), @(20), @(30), nil];
-        
+                
         _monsters = [[NSMutableArray alloc] init];
         _projectiles = [[NSMutableArray alloc] init];
         _lifeUps = [[NSMutableArray alloc] init];
@@ -151,8 +151,8 @@
         _lifeUpProbability = 0.1;
         _comboCounter = [LevelManager sharedManager].comboCounter;
         _lives = [LevelManager sharedManager].lives;
-        _level = [LevelManager sharedManager].level;
-        _monstersInLevel = [_monstersPerLevel[_level] intValue];
+        _level = [[LevelManager sharedManager] curLevel];
+        _monstersInLevel = _level.enemiesNum;
 
         NSString* enemyCountMessage = [NSString stringWithFormat: @"Enemies killed %d/%d", _monstersDestroyed, _monstersInLevel];
         _enemyCountLabel = [CCLabelTTF labelWithString:enemyCountMessage fontName:@"Arial" fontSize:28];
@@ -160,13 +160,13 @@
         _enemyCountLabel.position = ccp(winSize.width/2, winSize.height/2);
         [self addChild:_enemyCountLabel];
         
-        NSString* levelMessage = [NSString stringWithFormat: @"Level %d", _level];
+        NSString* levelMessage = [NSString stringWithFormat: @"Level %d", _level.levelNum];
         _levelLabel = [CCLabelTTF labelWithString:levelMessage fontName:@"Arial" fontSize:28];
         _levelLabel.color = ccc3(0,0,0);
         _levelLabel.position = ccp(winSize.width - _levelLabel.contentSize.width, winSize.height - _levelLabel.contentSize.height/2);
         [self addChild:_levelLabel];
         
-        NSString* livesMessage = [NSString stringWithFormat: @"Lives %d", _level];
+        NSString* livesMessage = [NSString stringWithFormat: @"Lives %d", _level.levelNum];
         _livesLabel = [CCLabelTTF labelWithString:livesMessage fontName:@"Arial" fontSize:28];
         _livesLabel.color = ccc3(0,0,0);
         _livesLabel.position = ccp(winSize.width/2 + _livesLabel.contentSize.width/2, winSize.height - _livesLabel.contentSize.height/2);
@@ -330,12 +330,8 @@
             [_enemyCountLabel setString: [NSString stringWithFormat: @"Enemies killed %d/%d", _monstersDestroyed, _monstersInLevel]];
             _comboCounter++;
             [_comboLabel setString:[NSString stringWithFormat: @"Combo: x%d", _comboCounter]];
+
             if (_monstersDestroyed >= _monstersInLevel) {
-                int level = ++_level;
-                if (level >= 3) {
-                    _level = 0;
-                }
-                
                 CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES caller:self];
                 [[CCDirector sharedDirector] replaceScene:gameOverScene];
             }

@@ -27,15 +27,19 @@
         _callerLayer = callerLayer;
         NSString * message;
         if (won) {
-            message = @"You Won!";
-            [LevelManager sharedManager].level = ((HelloWorldLayer*)_callerLayer).level;
-            [LevelManager sharedManager].lives = ((HelloWorldLayer*)_callerLayer).lives;
-            [LevelManager sharedManager].comboCounter = ((HelloWorldLayer*)_callerLayer).comboCounter;
+            [LevelManager sharedManager].level++;
+            Level * curLevel = [[LevelManager sharedManager] curLevel];
+            if (curLevel) {
+                message = [NSString stringWithFormat:@"Get ready for level %d!", curLevel.levelNum];
+                [LevelManager sharedManager].level = ((HelloWorldLayer*)_callerLayer).level;
+                [LevelManager sharedManager].lives = ((HelloWorldLayer*)_callerLayer).lives;
+                [LevelManager sharedManager].comboCounter = ((HelloWorldLayer*)_callerLayer).comboCounter;
+            } else {
+                message = @"You Won!";
+            }
         } else {
             message = @"You Lose :[";
-            [LevelManager sharedManager].level = 0;
-            [LevelManager sharedManager].lives = 3;
-            [LevelManager sharedManager].comboCounter = 0;
+            [[LevelManager sharedManager] reset];
         }
 
         CGSize winSize = [[CCDirector sharedDirector] winSize];

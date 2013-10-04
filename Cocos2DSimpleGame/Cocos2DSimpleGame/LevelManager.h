@@ -7,13 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Level.h"
 
 @interface LevelManager : NSObject
 
 @property int level;
+@property NSArray * levels;
 @property int lives;
 @property int comboCounter;
+@property (nonatomic) Level* curLevel;
 
 + (LevelManager*)sharedManager;
-
+- (Level *)curLevel;
+- (void)reset;
 @end
