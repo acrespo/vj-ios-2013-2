@@ -187,7 +187,14 @@
                                     target:self selector:@selector(pauseButtonTapped:)];
         _starMenuItem.scale = 0.5;
         _starMenuItem.position = ccp(winSize.width-_starMenuItem.boundingBox.size.width/2, _starMenuItem.boundingBox.size.height/2);
-        CCMenu *starMenu = [CCMenu menuWithItems:_starMenuItem, nil];
+
+        _nextLevelMenuItem = [CCMenuItemImage
+                         itemWithNormalImage:@"ButtonPlus.png" selectedImage:@"ButtonPlusSel.png"
+                         target:self selector:@selector(nextLevel:)];
+        _nextLevelMenuItem.scale = 0.5;
+        _nextLevelMenuItem.position = ccp(winSize.width-_nextLevelMenuItem.boundingBox.size.width/2, _nextLevelMenuItem.boundingBox.size.height/2 + _starMenuItem.boundingBox.size.height);
+
+        CCMenu *starMenu = [CCMenu menuWithItems:_starMenuItem, _nextLevelMenuItem, nil];
         starMenu.position = CGPointZero;
         [self addChild:starMenu];
         
@@ -243,6 +250,13 @@
     [_starMenuItem setTarget:self selector:@selector(unpauseButtonTapped:)];
 
 }
+
+- (void)nextLevel:(id)sender {
+    CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES caller:self];
+    [CCDirector sharedDirector].scheduler.timeScale = 1;
+    [[CCDirector sharedDirector] replaceScene:gameOverScene];
+}
+
 
 - (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     
