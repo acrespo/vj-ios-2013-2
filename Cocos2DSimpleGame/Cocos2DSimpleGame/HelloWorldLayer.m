@@ -258,9 +258,12 @@
     
     // Determine offset of location to projectile
     CGPoint offset = ccpSub(location, _nextProjectile.position);
-    
+
     // Bail out if you are shooting down or backwards
-    if (offset.x <= 0) return;
+    if (offset.x <= 0) {
+        _nextProjectile = nil;
+        return;
+    }
     
     int realX = winSize.width + (_nextProjectile.contentSize.width/2);
     float ratio = (float) offset.y / (float) offset.x;
@@ -278,7 +281,7 @@
     float angleRadians = atanf((float)offRealY / (float)offRealX);
     float angleDegrees = CC_RADIANS_TO_DEGREES(angleRadians);
     float cocosAngle = -1 * angleDegrees;
-    float rotateDegreesPerSecond = 180 / 0.3; // Would take 0.5 seconds to rotate 180 degrees, or half a circle
+    float rotateDegreesPerSecond = 180 / 0.1; // Would take 0.5 seconds to rotate 180 degrees, or half a circle
     float degreesDiff = _player.rotation - cocosAngle;
     float rotateDuration = fabs(degreesDiff / rotateDegreesPerSecond);
     [_player runAction:
