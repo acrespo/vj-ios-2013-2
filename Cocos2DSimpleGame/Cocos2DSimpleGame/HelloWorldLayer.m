@@ -177,7 +177,8 @@
         _starMenuItem = [CCMenuItemImage
                                     itemWithNormalImage:@"ButtonStar.png" selectedImage:@"ButtonStarSel.png"
                                     target:self selector:@selector(pauseButtonTapped:)];
-        _starMenuItem.position = ccp(winSize.width-_starMenuItem.contentSize.width/2, _starMenuItem.contentSize.height/2);
+        _starMenuItem.scale = 0.5;
+        _starMenuItem.position = ccp(winSize.width-_starMenuItem.boundingBox.size.width/2, _starMenuItem.boundingBox.size.height/2);
         CCMenu *starMenu = [CCMenu menuWithItems:_starMenuItem, nil];
         starMenu.position = CGPointZero;
         [self addChild:starMenu];
@@ -185,7 +186,7 @@
         NSString* pauseMenuMessage = [NSString stringWithFormat: @"Pause"];
         _pauseLabel = [CCLabelTTF labelWithString:pauseMenuMessage fontName:@"Arial" fontSize:28];
         _pauseLabel.color = ccc3(0,0,0);
-        _pauseLabel.position = ccp(winSize.width - _starMenuItem.contentSize.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2);
+        _pauseLabel.position = ccp(winSize.width - _starMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2);
         [self addChild:_pauseLabel];
         
 
@@ -221,7 +222,7 @@
 
 - (void)unpauseButtonTapped:(id)sender {
     [_pauseLabel setString:@"Pause"];
-    [_pauseLabel setPosition:ccp(winSize.width - _starMenuItem.contentSize.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
+    [_pauseLabel setPosition:ccp(winSize.width - _starMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
     [CCDirector sharedDirector].scheduler.timeScale = 1;
     [_starMenuItem setTarget:self selector:@selector(pauseButtonTapped:)];
 }
@@ -229,7 +230,7 @@
 
 - (void)pauseButtonTapped:(id)sender {
     [_pauseLabel setString:@"Resume"];
-    [_pauseLabel setPosition:ccp(winSize.width - _starMenuItem.contentSize.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
+    [_pauseLabel setPosition:ccp(winSize.width - _starMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
     [CCDirector sharedDirector].scheduler.timeScale = 0;
     [_starMenuItem setTarget:self selector:@selector(unpauseButtonTapped:)];
 
