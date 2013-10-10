@@ -204,8 +204,10 @@
         _pauseLabel.position = ccp(winSize.width - _starMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2);
         [self addChild:_pauseLabel];
         
-
-        
+        CCParticleSystem* p = _level.particleSystem;
+        if (p) {
+            [self addChild:p];
+        }
 
         NSString* comboMessage = [NSString stringWithFormat: @"Combo: x%d", _comboCounter];
         _comboLabel = [CCLabelTTF labelWithString:comboMessage fontName:@"Arial" fontSize:12];

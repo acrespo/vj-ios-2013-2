@@ -29,6 +29,7 @@
     CCLabelTTF * _comboLabel;
     CCLabelTTF * _pauseLabel;
     CCMenuItem * _starMenuItem;
+    CCMenuItem * _nextLevelMenuItem;
     CGSize winSize;
     CCSprite *_player;
     CCSprite *_nextProjectile;

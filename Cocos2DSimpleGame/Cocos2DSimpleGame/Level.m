@@ -10,12 +10,13 @@
 
 @implementation Level
 
-- (id)initWithLevelNum:(int)levelNum enemiesNum:(int)enemiesNum secsPerSpawn:(float)secsPerSpawn backgroundColor:(ccColor4B)backgroundColor {
+- (id)initWithLevelNum:(int)levelNum enemiesNum:(int)enemiesNum secsPerSpawn:(float)secsPerSpawn backgroundColor:(ccColor4B)backgroundColor particleSystem:(CCParticleSystem*)particleSystem{
     if ((self = [super init])) {
         self.levelNum = levelNum;
         self.secsPerSpawn = secsPerSpawn;
         self.backgroundColor = backgroundColor;
         self.enemiesNum = enemiesNum;
+        self.particleSystem = particleSystem;
     }
     return self;
 }

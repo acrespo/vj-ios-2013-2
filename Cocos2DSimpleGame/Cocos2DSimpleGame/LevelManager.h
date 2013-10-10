@@ -16,6 +16,7 @@
 @property int lives;
 @property int comboCounter;
 @property (nonatomic) Level* curLevel;
+@property CGSize winSize;
 
 + (LevelManager*)sharedManager;
 - (Level *)curLevel;
