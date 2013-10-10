@@ -42,12 +42,7 @@
 - (void) addMonster {
     
     //CCSprite * monster = [CCSprite spriteWithFile:@"monster.png"];
-    Monster * monster = nil;
-    if (arc4random() % 4 == 0) {
-        monster = [[StrongAndSlowMonster alloc] init];
-    } else {
-        monster = [[WeakAndFastMonster alloc] init];
-    }
+    Monster* monster = [self createMonster];
 
     // Determine where to spawn the monster along the Y axis
     int minY = monster.contentSize.height / 2;
@@ -87,6 +82,19 @@
     [_monsters addObject:monster];
     
 }
+
+- (Monster*) createMonster {
+    Monster * monster = nil;
+    if (arc4random() % 10 < 5) {
+        monster = [[WeakAndFastMonster alloc] init];
+    } else if (arc4random() % 10 < 8) {
+        monster = [[StrongAndSlowMonster alloc] init];
+    } else if (arc4random() % 10 < 10) {
+        monster = [[StrongAndStupidMonster alloc] init];
+    }
+    return monster;
+}
+
 
 - (void) addLifeBonus {
 

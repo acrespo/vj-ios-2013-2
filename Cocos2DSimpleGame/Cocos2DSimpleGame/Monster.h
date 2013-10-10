@@ -24,3 +24,6 @@
 
 @interface StrongAndSlowMonster : Monster
 @end
+
+@interface StrongAndStupidMonster : Monster
+@end

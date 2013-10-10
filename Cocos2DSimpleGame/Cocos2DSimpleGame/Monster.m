@@ -40,3 +40,15 @@
 }
 
 @end
+
+@implementation StrongAndStupidMonster
+
+- (id)init {
+    if ((self = [super initWithFile:@"16bitEnemySprites_Crouch_v11.gif" hp:3 minMoveDuration:6 maxMoveDuration:12])) {
+        scaleX_ = 68 / contentSize_.width;
+        scaleY_ = 50 / contentSize_.height;
+    }
+    return self;
+}
+
+@end
