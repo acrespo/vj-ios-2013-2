@@ -26,14 +26,15 @@
         _comboCounter = 0;
         _winSize = [CCDirector sharedDirector].winSize;
         
-        CCParticleRain *rain = [[CCParticleRain alloc] initWithTotalParticles:100];
-        rain.life += 3;
+        CCParticleRain *rain = [[CCParticleRain alloc] initWithTotalParticles:500];
+        rain.life += 1;
         rain.position = ccp(_winSize.width/2, _winSize.height);
         [rain setBlendAdditive:NO];
         
-        CCParticleSnow *snow = [[CCParticleSnow alloc] initWithTotalParticles:50];
-        rain.position = ccp(_winSize.width/2, _winSize.height);
-        [rain setBlendAdditive:NO];
+        CCParticleSnow *snow = [[CCParticleSnow alloc] initWithTotalParticles:500];
+        [snow setTexture:[[CCTextureCache sharedTextureCache] addImage:@"Snowflake-white.png"]];
+        snow.position = ccp(_winSize.width/2, _winSize.height);
+        [snow setBlendAdditive:NO];
         
         Level * level1 = [[Level alloc] initWithLevelNum:1 enemiesNum:5 secsPerSpawn:2 backgroundColor:ccc4(255, 255, 255, 255) particleSystem:rain];
         Level * level2 = [[Level alloc] initWithLevelNum:2 enemiesNum:10 secsPerSpawn:1 backgroundColor:ccc4(100, 150, 20, 255) particleSystem:nil];
