@@ -178,6 +178,7 @@
 		8F59AF6117E2685600D26DFD /* heartempty-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F59AF5D17E2685600D26DFD /* heartempty-hd.png */; };
 		8F59AF6217E2685600D26DFD /* heartempty.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F59AF5E17E2685600D26DFD /* heartempty.png */; };
 		8FE8FFD118077802005A53CB /* Snowflake-white.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FE8FFD018077802005A53CB /* Snowflake-white.png */; };
+		8FEE40B618109E08007B37F7 /* water_drop-icon.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8FEE40B518109E08007B37F7 /* water_drop-icon.gif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -498,6 +499,7 @@
 		8F59AF5D17E2685600D26DFD /* heartempty-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "heartempty-hd.png"; sourceTree = "<group>"; };
 		8F59AF5E17E2685600D26DFD /* heartempty.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = heartempty.png; sourceTree = "<group>"; };
 		8FE8FFD018077802005A53CB /* Snowflake-white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Snowflake-white.png"; sourceTree = "<group>"; };
+		8FEE40B518109E08007B37F7 /* water_drop-icon.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "water_drop-icon.gif"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -965,6 +967,7 @@
 		35DC32541653184500862E62 /* Art */ = {
 			isa = PBXGroup;
 			children = (
+				8FEE40B518109E08007B37F7 /* water_drop-icon.gif */,
 				8FE8FFD018077802005A53CB /* Snowflake-white.png */,
 				8F3DA37D18073C8E0015DB95 /* 16bitEnemySprites_Crouch_v11.gif */,
 				8F4FD26817FE19010049AF12 /* monster2-hd.png */,
@@ -1112,6 +1115,7 @@
 				8F4FD27517FE2C1C0049AF12 /* d9271e_New_Super_Mario_Bros_Coin_Sound_Effect.mp3 in Resources */,
 				8F3DA37E18073C8E0015DB95 /* 16bitEnemySprites_Crouch_v11.gif in Resources */,
 				8FE8FFD118077802005A53CB /* Snowflake-white.png in Resources */,
+				8FEE40B618109E08007B37F7 /* water_drop-icon.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -25,6 +25,7 @@
     CGSize _winSize = [CCDirector sharedDirector].winSize;
     if(_levelNum == 1) {
         CCParticleRain *rain = [[CCParticleRain alloc] initWithTotalParticles:500];
+        [rain setTexture:[[CCTextureCache sharedTextureCache] addImage:@"water_drop-icon.gif"]];
         rain.life += 1;
         rain.position = ccp(_winSize.width/2, _winSize.height);
         [rain setBlendAdditive:NO];
@@ -36,6 +37,7 @@
         [snow setBlendAdditive:NO];
         return snow;
     }
+    return nil;
 }
 
 @end
