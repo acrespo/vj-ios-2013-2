@@ -15,9 +15,9 @@
 @property (nonatomic, assign) int enemiesNum;
 @property (nonatomic, assign) float secsPerSpawn;
 @property (nonatomic, assign) ccColor4B backgroundColor;
-@property (nonatomic, assign) CCParticleSystem * particleSystem;
 
-- (id)initWithLevelNum:(int)levelNum enemiesNum:(int)enemiesNum secsPerSpawn:(float)secsPerSpawn backgroundColor:(ccColor4B)backgroundColor particleSystem:(CCParticleSystem*)particleSystem;
+- (id)initWithLevelNum:(int)levelNum enemiesNum:(int)enemiesNum secsPerSpawn:(float)secsPerSpawn backgroundColor:(ccColor4B)backgroundColor;
 
+-(CCParticleSystem*) getParticleSystem;
 @end
 

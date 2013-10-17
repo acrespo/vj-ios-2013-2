@@ -69,8 +69,7 @@
         
         _lives--;
         if (_lives < 0) {
-            CCScene *gameOverScene = [GameOverLayer sceneWithWon:NO caller:self];
-            [[CCDirector sharedDirector] replaceScene:gameOverScene];
+            [self nextSceneWithWon:NO];
         } else {
             [_heartSprites[_lives] setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
             [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", _lives]];
@@ -204,8 +203,11 @@
         _pauseLabel.position = ccp(winSize.width - _starMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2);
         [self addChild:_pauseLabel];
         
-        CCParticleSystem* p = _level.particleSystem;
+        CCParticleSystem* p = [_level getParticleSystem];
         if (p) {
+            if(p.parent) {
+                p.parent = nil;
+            }
             [self addChild:p];
         }
 
@@ -254,7 +256,11 @@
 }
 
 - (void)nextLevel:(id)sender {
-    CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES caller:self];
+    [self nextSceneWithWon:YES];
+}
+
+- (void)nextSceneWithWon:(bool)won {
+    CCScene *gameOverScene = [GameOverLayer sceneWithWon:won caller:self];
     [CCDirector sharedDirector].scheduler.timeScale = 1;
     [[CCDirector sharedDirector] replaceScene:gameOverScene];
 }
@@ -360,8 +366,7 @@
             [_comboLabel setString:[NSString stringWithFormat: @"Combo: x%d", _comboCounter]];
 
             if (_monstersDestroyed >= _monstersInLevel) {
-                CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES caller:self];
-                [[CCDirector sharedDirector] replaceScene:gameOverScene];
+                [self nextSceneWithWon:YES];
             }
         }
         
