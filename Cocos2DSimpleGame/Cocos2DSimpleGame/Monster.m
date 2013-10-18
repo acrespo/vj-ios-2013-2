@@ -7,6 +7,7 @@
 //
 
 #import "Monster.h"
+#import "HelloWorldLayer.h"
 
 @implementation Monster
 
@@ -15,10 +16,51 @@
         self.hp = hp;
         self.minMoveDuration = minMoveDuration;
         self.maxMoveDuration = maxMoveDuration;
+        
+        // Determine speed of the monster
+        int minDuration = self.minMoveDuration; //2.0;
+        int maxDuration = self.maxMoveDuration; //4.0;
+        int rangeDuration = maxDuration - minDuration;
+        int actualDuration = (arc4random() % rangeDuration) + minDuration;
+        
+        CGSize winSize = [CCDirector sharedDirector].winSize;
+        float distance = winSize.width + self.contentSize.width;
+        self.speed = distance / (float)actualDuration;
     }
+    
+    [self schedule:@selector(update:)];
     return self;
 }
 
+- (id)initWithSpriteFrameName:(NSString *)frame hp:(int)hp minMoveDuration:(int)minMoveDuration maxMoveDuration:(int)maxMoveDuration {
+    if ((self = [super initWithSpriteFrameName:frame])) {
+        self.hp = hp;
+        self.minMoveDuration = minMoveDuration;
+        self.maxMoveDuration = maxMoveDuration;
+        
+        // Determine speed of the monster
+        int minDuration = self.minMoveDuration; //2.0;
+        int maxDuration = self.maxMoveDuration; //4.0;
+        int rangeDuration = maxDuration - minDuration;
+        int actualDuration = (arc4random() % rangeDuration) + minDuration;
+        
+        CGSize winSize = [CCDirector sharedDirector].winSize;
+        float distance = winSize.width + self.contentSize.width;
+        self.speed = distance / (float)actualDuration;
+    }
+    
+    [self schedule:@selector(update:)];
+    return self;
+}
+
+- (void)update:(ccTime)delta {
+    
+    self.position = ccp(self.position.x - delta*_speed, self.position.y);
+    
+    if(self.position.x < 0) {
+        [(HelloWorldLayer* )parent_ monsterBreach:self];
+    }
+}
 @end
 
 @implementation WeakAndFastMonster
@@ -44,7 +86,7 @@
 @implementation StrongAndStupidMonster
 
 - (id)init {
-    if ((self = [super initWithFile:@"16bitEnemySprites_Crouch_v11.gif" hp:3 minMoveDuration:6 maxMoveDuration:12])) {
+    if ((self = [super initWithSpriteFrameName:@"tiles-0.png" hp:3 minMoveDuration:6 maxMoveDuration:12])) {
         scaleX_ = 68 / contentSize_.width;
         scaleY_ = 50 / contentSize_.height;
     }

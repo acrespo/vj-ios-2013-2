@@ -34,6 +34,8 @@
     CCSprite *_player;
     CCSprite *_nextProjectile;
     int _backgroundMusicVolume;
+    CCAnimation * _walkAnim;
+    CCSpriteBatchNode * _spriteSheet;
 
 }
 @property Level* level;
@@ -42,4 +44,6 @@
 
 // returns a CCScene that contains the HelloWorldLayer as the only child
 +(CCScene *) scene;
+
+-(void) monsterBreach:(CCNode*)node;
 @end

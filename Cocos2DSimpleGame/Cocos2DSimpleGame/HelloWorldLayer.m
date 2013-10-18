@@ -42,7 +42,7 @@
 - (void) addMonster {
     
     //CCSprite * monster = [CCSprite spriteWithFile:@"monster.png"];
-    Monster* monster = [self createMonster];
+    Monster* monster = [self createMonsterWithParent:self];
 
     // Determine where to spawn the monster along the Y axis
     int minY = monster.contentSize.height / 2;
@@ -53,43 +53,38 @@
     // Create the monster slightly off-screen along the right edge,
     // and along a random position along the Y axis as calculated above
     monster.position = ccp(winSize.width + monster.contentSize.width/2, actualY);
-    [self addChild:monster];
-    
-    // Determine speed of the monster
-    int minDuration = monster.minMoveDuration; //2.0;
-    int maxDuration = monster.maxMoveDuration; //4.0;
-    int rangeDuration = maxDuration - minDuration;
-    int actualDuration = (arc4random() % rangeDuration) + minDuration;
-    
-    // Create the actions
-    CCMoveTo * actionMove = [CCMoveTo actionWithDuration:actualDuration position:ccp(-monster.contentSize.width/2, actualY)];
-    CCCallBlockN * actionMoveDone = [CCCallBlockN actionWithBlock:^(CCNode *node) {
-        [_monsters removeObject:node];
-        [node removeFromParentAndCleanup:YES];
-        
-        _lives--;
-        if (_lives < 0) {
-            [self nextSceneWithWon:NO];
-        } else {
-            [_heartSprites[_lives] setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
-            [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", _lives]];
-        }
-    }];
-    [monster runAction:[CCSequence actions:actionMove, actionMoveDone, nil]];
     
     monster.tag = 1;
     [_monsters addObject:monster];
-    
 }
 
-- (Monster*) createMonster {
+-(void)monsterBreach:(CCNode *)node {
+    [_monsters removeObject:node];
+    [node removeFromParentAndCleanup:YES];
+    
+    _lives--;
+    if (_lives < 0) {
+        [self nextSceneWithWon:NO];
+    } else {
+        [_heartSprites[_lives] setTexture:[[CCSprite spriteWithFile:@"heartempty.png"] texture]];
+        [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", _lives]];
+    }
+}
+
+- (Monster*) createMonsterWithParent:(CCLayerColor*) parent {
     Monster * monster = nil;
-    if (arc4random() % 10 < 5) {
+    if (arc4random() % 100 < 50) {
         monster = [[WeakAndFastMonster alloc] init];
-    } else if (arc4random() % 10 < 8) {
+        [self addChild:monster];
+    } else if (arc4random() % 100 < 80) {
         monster = [[StrongAndSlowMonster alloc] init];
-    } else if (arc4random() % 10 < 10) {
+        [self addChild:monster];
+    } else {
         monster = [[StrongAndStupidMonster alloc] init];
+        CCAction *walkAction = [CCRepeatForever actionWithAction:
+                                [CCAnimate actionWithAnimation:_walkAnim]];
+        [monster runAction:walkAction];
+        [_spriteSheet addChild:monster];
     }
     return monster;
 }
@@ -231,9 +226,21 @@
         
         [self schedule:@selector(update:)];
         
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"demon.plist"];
+        _spriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"demon.png"];
+        [self addChild:_spriteSheet];
+        
+        NSMutableArray *walkAnimFrames = [NSMutableArray array];
+        for (int i=0; i<=5; i++) {
+            [walkAnimFrames addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"tiles-%d.png",i]]];
+        }
+        
+        _walkAnim = [CCAnimation animationWithSpriteFrames:walkAnimFrames delay:0.1f];
+        
         [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"background-music-aac.caf"];
         _backgroundMusicVolume = [SimpleAudioEngine sharedEngine].backgroundMusicVolume;
-        [SimpleAudioEngine sharedEngine].backgroundMusicVolume = _backgroundMusicVolume/5.0;
         
     }
     return self;

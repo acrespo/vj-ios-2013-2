@@ -14,8 +14,11 @@
 @property (nonatomic, assign) int hp;
 @property (nonatomic, assign) int minMoveDuration;
 @property (nonatomic, assign) int maxMoveDuration;
+@property (nonatomic, assign) float speed;
 
 - (id)initWithFile:(NSString *)file hp:(int)hp minMoveDuration:(int)minMoveDuration maxMoveDuration:(int)maxMoveDuration;
+
+- (id)initWithSpriteFrameName:(NSString *)file hp:(int)hp minMoveDuration:(int)minMoveDuration maxMoveDuration:(int)maxMoveDuration;
 
 @end
 
