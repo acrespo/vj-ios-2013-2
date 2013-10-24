@@ -58,7 +58,10 @@
     self.position = ccp(self.position.x - delta*_speed, self.position.y);
     
     if(self.position.x < 0) {
-        [(HelloWorldLayer* )parent_ monsterBreach:self];
+        if ([parent_ isKindOfClass:[HelloWorldLayer class]])
+            [(HelloWorldLayer*)parent_ monsterBreach:self];
+        else
+            [(HelloWorldLayer*)parent_.parent monsterBreach:self];
     }
 }
 @end
@@ -86,7 +89,7 @@
 @implementation StrongAndStupidMonster
 
 - (id)init {
-    if ((self = [super initWithSpriteFrameName:@"tiles-0.png" hp:3 minMoveDuration:6 maxMoveDuration:12])) {
+    if ((self = [super initWithSpriteFrameName:@"demon1.png" hp:3 minMoveDuration:6 maxMoveDuration:12])) {
         scaleX_ = 68 / contentSize_.width;
         scaleY_ = 50 / contentSize_.height;
     }

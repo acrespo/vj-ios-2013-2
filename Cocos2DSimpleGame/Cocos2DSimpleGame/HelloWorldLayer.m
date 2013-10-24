@@ -226,15 +226,15 @@
         
         [self schedule:@selector(update:)];
         
-        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"demon.plist"];
-        _spriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"demon.png"];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"demonAnim.plist"];
+        _spriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"demonAnim.png"];
         [self addChild:_spriteSheet];
         
         NSMutableArray *walkAnimFrames = [NSMutableArray array];
-        for (int i=0; i<=5; i++) {
+        for (int i=1; i<=6; i++) {
             [walkAnimFrames addObject:
              [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-              [NSString stringWithFormat:@"tiles-%d.png",i]]];
+              [NSString stringWithFormat:@"demon%d.png",i]]];
         }
         
         _walkAnim = [CCAnimation animationWithSpriteFrames:walkAnimFrames delay:0.1f];
@@ -365,6 +365,8 @@
                 
         for (Monster *monster in monstersToDelete) {
             [_monsters removeObject:monster];
+            if ([monster isKindOfClass:[StrongAndStupidMonster class]])
+                [_spriteSheet removeChild:monster cleanup:YES];
             [self removeChild:monster cleanup:YES];
             
             _monstersDestroyed++;

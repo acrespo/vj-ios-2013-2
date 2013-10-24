@@ -4,7 +4,7 @@
     <dict>
         <key>frames</key>
         <dict>
-            <key>tiles-0.png</key>
+            <key>demon1.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,2},{211,157}}</string>
@@ -17,7 +17,7 @@
                 <key>sourceSize</key>
                 <string>{211,157}</string>
             </dict>
-            <key>tiles-1.png</key>
+            <key>demon2.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{215,2},{211,157}}</string>
@@ -30,7 +30,7 @@
                 <key>sourceSize</key>
                 <string>{211,157}</string>
             </dict>
-            <key>tiles-2.png</key>
+            <key>demon3.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,161},{211,157}}</string>
@@ -43,7 +43,7 @@
                 <key>sourceSize</key>
                 <string>{211,157}</string>
             </dict>
-            <key>tiles-3.png</key>
+            <key>demon4.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{215,161},{211,157}}</string>
@@ -56,7 +56,7 @@
                 <key>sourceSize</key>
                 <string>{211,157}</string>
             </dict>
-            <key>tiles-4.png</key>
+            <key>demon5.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,320},{211,157}}</string>
@@ -69,7 +69,7 @@
                 <key>sourceSize</key>
                 <string>{211,157}</string>
             </dict>
-            <key>tiles-5.png</key>
+            <key>demon6.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{215,320},{211,157}}</string>
@@ -88,13 +88,13 @@
             <key>format</key>
             <integer>2</integer>
             <key>realTextureFileName</key>
-            <string>demon.png</string>
+            <string>demonAnim.png</string>
             <key>size</key>
             <string>{512,512}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:50831084f48223aa42d5c7dd0e49c19f$</string>
+            <string>$TexturePacker:SmartUpdate:b54144a8790d87cec7831b3e87b59aa8$</string>
             <key>textureFileName</key>
-            <string>demon.png</string>
+            <string>demonAnim.png</string>
         </dict>
     </dict>
 </plist>
