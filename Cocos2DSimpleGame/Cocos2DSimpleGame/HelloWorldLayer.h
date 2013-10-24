@@ -36,6 +36,10 @@
     int _backgroundMusicVolume;
     CCAnimation * _walkAnim;
     CCSpriteBatchNode * _spriteSheet;
+    bool _touching;
+    NSSet* _lastTouches;
+    float _reloadTime;
+    float _reloadCount;
 
 }
 @property Level* level;

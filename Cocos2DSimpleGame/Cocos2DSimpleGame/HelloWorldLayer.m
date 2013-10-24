@@ -142,6 +142,8 @@
         _player.position = ccp(_player.contentSize.width/2, winSize.height/2);
         [self addChild:_player];
         
+        _reloadTime = 0.2f;
+        
         [self schedule:@selector(gameLogic:) interval:[LevelManager sharedManager].curLevel.secsPerSpawn];
         
         [self setTouchEnabled:YES];
@@ -272,13 +274,25 @@
     [[CCDirector sharedDirector] replaceScene:gameOverScene];
 }
 
+- (void)ccTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    _touching = true;
+    _lastTouches = touches;
+}
+
+- (void)ccTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    _lastTouches = touches;
+    _touching = true;
+}
 
 - (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    
+    _touching = false;
+}
+
+- (void)handleShot {
     if (_nextProjectile != nil) return;
     
     // Choose one of the touches to work with
-    UITouch *touch = [touches anyObject];
+    UITouch *touch = [_lastTouches anyObject];
     CGPoint location = [self convertTouchToNodeSpace:touch];
     
     // Set up initial location of projectile
@@ -287,7 +301,7 @@
     
     // Determine offset of location to projectile
     CGPoint offset = ccpSub(location, _nextProjectile.position);
-
+    
     // Bail out if you are shooting down or backwards
     if (offset.x <= 0) {
         _nextProjectile = nil;
@@ -334,7 +348,7 @@
          _comboCounter = 0;
          [_comboLabel setString:[NSString stringWithFormat: @"Combo: x%d", _comboCounter]];
          [node removeFromParentAndCleanup:YES];
-    }],
+     }],
       nil]];
     
     _nextProjectile.tag = 2;
@@ -343,7 +357,15 @@
     [[SimpleAudioEngine sharedEngine] playEffect:@"pew-pew-lei.caf"];
 }
 
+
 - (void)update:(ccTime)dt {
+    
+    _reloadCount -= dt;
+    if (_touching == true && _reloadCount < 0) {
+        [self handleShot];
+            NSLog(@"SHOOOOOT");
+        _reloadCount = _reloadTime;        
+    }
     
     NSMutableArray *projectilesToDelete = [[NSMutableArray alloc] init];
     for (CCSprite *projectile in _projectiles) {
