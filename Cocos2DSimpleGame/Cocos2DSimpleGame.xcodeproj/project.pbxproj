@@ -150,6 +150,7 @@
 		35DC32681653249C00862E62 /* GameOverLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 35DC32671653249C00862E62 /* GameOverLayer.m */; };
 		8F2319861819BDE5005D0A06 /* demonAnim.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8F2319851819BDE5005D0A06 /* demonAnim.plist */; };
 		8F2319881819BE40005D0A06 /* demonAnim.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F2319871819BE40005D0A06 /* demonAnim.png */; };
+		8F23198A1819EC4F005D0A06 /* shotgun.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F2319891819EC4E005D0A06 /* shotgun.png */; };
 		8F3CC52417F4F9F1004F5C24 /* Button1.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F3CC51817F4F9F1004F5C24 /* Button1.png */; };
 		8F3CC52517F4F9F1004F5C24 /* Button1Sel.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F3CC51917F4F9F1004F5C24 /* Button1Sel.png */; };
 		8F3CC52617F4F9F1004F5C24 /* Button2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F3CC51A17F4F9F1004F5C24 /* Button2.png */; };
@@ -470,6 +471,7 @@
 		35DC32671653249C00862E62 /* GameOverLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameOverLayer.m; sourceTree = "<group>"; };
 		8F2319851819BDE5005D0A06 /* demonAnim.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = demonAnim.plist; sourceTree = "<group>"; };
 		8F2319871819BE40005D0A06 /* demonAnim.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = demonAnim.png; sourceTree = "<group>"; };
+		8F2319891819EC4E005D0A06 /* shotgun.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shotgun.png; sourceTree = "<group>"; };
 		8F3CC51817F4F9F1004F5C24 /* Button1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button1.png; sourceTree = "<group>"; };
 		8F3CC51917F4F9F1004F5C24 /* Button1Sel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button1Sel.png; sourceTree = "<group>"; };
 		8F3CC51A17F4F9F1004F5C24 /* Button2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button2.png; sourceTree = "<group>"; };
@@ -971,6 +973,7 @@
 		35DC32541653184500862E62 /* Art */ = {
 			isa = PBXGroup;
 			children = (
+				8F2319891819EC4E005D0A06 /* shotgun.png */,
 				8F2319871819BE40005D0A06 /* demonAnim.png */,
 				8F2319851819BDE5005D0A06 /* demonAnim.plist */,
 				8FEE40B518109E08007B37F7 /* water_drop-icon.gif */,
@@ -1124,6 +1127,7 @@
 				8FEE40B618109E08007B37F7 /* water_drop-icon.gif in Resources */,
 				8F2319861819BDE5005D0A06 /* demonAnim.plist in Resources */,
 				8F2319881819BE40005D0A06 /* demonAnim.png in Resources */,
+				8F23198A1819EC4F005D0A06 /* shotgun.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

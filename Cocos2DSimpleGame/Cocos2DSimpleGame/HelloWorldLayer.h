@@ -19,6 +19,7 @@
     NSMutableArray * _monsters;
     NSMutableArray * _lifeUps;
     NSMutableArray * _projectiles;
+    NSMutableArray * _gunBonuses;
     NSArray* _heartSprites;
     int _monstersDestroyed;
     int _monstersInLevel;

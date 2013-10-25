@@ -124,8 +124,43 @@
     
 }
 
+- (void)addGunBonus {
+    
+    CCSprite * gunBonus = [CCSprite spriteWithFile:@"shotgun.png"];
+    
+    gunBonus.scale = 0.10f;
+    // Determine where to spawn the lifeup along the Y axis
+    int minY = gunBonus.contentSize.height / 2;
+    int maxY = winSize.height - gunBonus.contentSize.height/2;
+    int rangeY = maxY - minY;
+    int actualY = (arc4random() % rangeY) + minY;
+    
+    // Create the lifeup sprite slightly off-screen along the right edge,
+    // and along a random position along the Y axis as calculated above
+    gunBonus.position = ccp(winSize.width + gunBonus.contentSize.width/2, actualY);
+    [self addChild:gunBonus];
+    
+    // Determine speed of the life bonus
+    int minDuration = 2.0;
+    int maxDuration = 4.0;
+    int rangeDuration = maxDuration - minDuration;
+    int actualDuration = (arc4random() % rangeDuration) + minDuration;
+    
+    // Create the actions
+    CCMoveTo * actionMove = [CCMoveTo actionWithDuration:actualDuration position:ccp(-gunBonus.contentSize.width/2, actualY)];
+    CCCallBlockN * actionMoveDone = [CCCallBlockN actionWithBlock:^(CCNode *node) {
+        [_lifeUps removeObject:node];
+        [node removeFromParentAndCleanup:YES];
+    }];
+    [gunBonus runAction:[CCSequence actions:actionMove, actionMoveDone, nil]];
+    
+    gunBonus.tag = 2;
+    [_gunBonuses addObject:gunBonus];
+    
+}
 -(void)gameLogic:(ccTime)dt {
     [self addMonster];
+    [self addGunBonus];
     float secsPerSpawn = [LevelManager sharedManager].curLevel.secsPerSpawn;
     float random = arc4random_uniform(100*secsPerSpawn)/(100.0*secsPerSpawn);
     if (random < _lifeUpProbability) {
@@ -401,7 +436,6 @@
             }
         }
         
-        
         NSMutableArray *livesToDelete = [[NSMutableArray alloc] init];
         for (CCSprite *life in _lifeUps) {
             
@@ -417,8 +451,20 @@
                 [_heartSprites[_lives] setTexture:[[CCSprite spriteWithFile:@"heart.png"] texture]];
                 _lives++;
                 [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", _lives]];
-                
             }
+        }
+        
+        NSMutableArray *gunBonusesToDelete = [[NSMutableArray alloc] init];
+        for (CCSprite *gunBonus in _gunBonuses) {
+            
+            if (CGRectIntersectsRect(projectile.boundingBox, gunBonus.boundingBox)) {
+                [gunBonusesToDelete addObject:gunBonus];
+            }
+        }
+
+        for (CCSprite *gunBonus in gunBonusesToDelete) {
+            [_gunBonuses removeObject:gunBonus];
+            [self removeChild:gunBonus cleanup:YES];
         }
         
         if (monsterHit) {
