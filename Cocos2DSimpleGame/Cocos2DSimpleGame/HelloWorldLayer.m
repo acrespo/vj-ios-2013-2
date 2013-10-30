@@ -149,7 +149,7 @@
     // Create the actions
     CCMoveTo * actionMove = [CCMoveTo actionWithDuration:actualDuration position:ccp(-gunBonus.contentSize.width/2, actualY)];
     CCCallBlockN * actionMoveDone = [CCCallBlockN actionWithBlock:^(CCNode *node) {
-        [_lifeUps removeObject:node];
+        [_gunBonuses removeObject:node];
         [node removeFromParentAndCleanup:YES];
     }];
     [gunBonus runAction:[CCSequence actions:actionMove, actionMoveDone, nil]];
@@ -186,6 +186,7 @@
         _monsters = [[NSMutableArray alloc] init];
         _projectiles = [[NSMutableArray alloc] init];
         _lifeUps = [[NSMutableArray alloc] init];
+        _gunBonuses = [[NSMutableArray alloc] init];
         
         _lifeUpProbability = 0.1;
         _comboCounter = [LevelManager sharedManager].comboCounter;
@@ -398,7 +399,6 @@
     _reloadCount -= dt;
     if (_touching == true && _reloadCount < 0) {
         [self handleShot];
-            NSLog(@"SHOOOOOT");
         _reloadCount = _reloadTime;        
     }
     
@@ -472,6 +472,9 @@
         } else if (livesToDelete.count > 0) {
             [projectilesToDelete addObject:projectile];
             [[SimpleAudioEngine sharedEngine] playEffect:@"3fc83f_Super_Mario_Bros_1_Up_Sound_Effect.mp3"];
+        } else if (gunBonusesToDelete.count > 0) {
+            [projectilesToDelete addObject:projectile];
+            [[SimpleAudioEngine sharedEngine] playEffect:@"d9271e_New_Super_Mario_Bros_Coin_Sound_Effect.mp3"];
         }
     }
     
@@ -488,6 +491,7 @@
     _monsters = nil;
     _projectiles = nil;
     _lifeUps = nil;
+    _gunBonuses = nil;
 }
 
 #pragma mark GameKit delegate
