@@ -17,8 +17,13 @@
 @property int comboCounter;
 @property (nonatomic) Level* curLevel;
 @property CGSize winSize;
+@property int ammo;
+@property int shotgunMaxAmmo;
+
 
 + (LevelManager*)sharedManager;
 - (Level *)curLevel;
 - (void)reset;
+- (void)reduceAmmo:(int)amount;
+- (void)loadAmmo:(int)amount;
 @end

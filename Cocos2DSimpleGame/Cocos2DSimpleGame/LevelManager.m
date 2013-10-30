@@ -25,7 +25,9 @@
         _lives = 3;
         _comboCounter = 0;
         _winSize = [CCDirector sharedDirector].winSize;
-        
+        _ammo = -1;
+        _shotgunMaxAmmo = 30;
+
         Level * level1 = [[Level alloc] initWithLevelNum:1 enemiesNum:5 secsPerSpawn:2 backgroundColor:ccc4(255, 255, 255, 255)];
         Level * level2 = [[Level alloc] initWithLevelNum:2 enemiesNum:10 secsPerSpawn:1 backgroundColor:ccc4(100, 150, 20, 255)];
         Level * level3 = [[Level alloc] initWithLevelNum:3 enemiesNum:15 secsPerSpawn:0.5 backgroundColor:ccc4(20, 150, 100, 255)];
@@ -52,6 +54,20 @@
     _levelNum = 0;
     _lives = 3;
     _comboCounter = 0;
+}
+
+- (void)reduceAmmo:(int)amount {
+    _ammo -= amount;
+    if (_ammo  < 0) {
+        _ammo = 0;
+    }
+}
+
+- (void)loadAmmo:(int)amount {
+    _ammo += amount;
+    if (_ammo  > _shotgunMaxAmmo) {
+        _ammo = _shotgunMaxAmmo;
+    }
 }
 
 @end

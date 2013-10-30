@@ -280,6 +280,7 @@
         [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"background-music-aac.caf"];
         _backgroundMusicVolume = [SimpleAudioEngine sharedEngine].backgroundMusicVolume;
         
+        gunType = Pistol;
     }
     return self;
 }
@@ -327,6 +328,10 @@
 - (void)handleShot {
     if (_nextProjectile != nil) return;
     
+    if ([LevelManager sharedManager].ammo  <= 0) {
+        gunType = Pistol;
+    }
+    
     // Choose one of the touches to work with
     UITouch *touch = [_lastTouches anyObject];
     CGPoint location = [self convertTouchToNodeSpace:touch];
@@ -349,6 +354,23 @@
     int realY = (realX * ratio) + _nextProjectile.position.y;
     CGPoint realDest = ccp(realX, realY);
     
+    CGPoint realDest2;
+    CGPoint realDest3;
+    CCSprite* secondProjectile;
+    CCSprite* thirdProjectile;
+    if (gunType == Shotgun) {
+         realDest2 = ccpRotateByAngle(realDest, _nextProjectile.position, tan(M_PI/12));
+        secondProjectile = [CCSprite spriteWithFile:@"projectile.png" rect:CGRectMake(0, 0, 20, 20)];
+        secondProjectile.position = ccp(20, winSize.height/2);
+    
+        realDest3 = ccpRotateByAngle(realDest, _nextProjectile.position, tan(-M_PI/12));
+        thirdProjectile = [CCSprite spriteWithFile:@"projectile.png" rect:CGRectMake(0, 0, 20, 20)];
+        thirdProjectile.position = ccp(20, winSize.height/2);
+        [[LevelManager sharedManager] reduceAmmo:3];
+        
+    }
+    
+
     // Determine the length of how far you're shooting
     int offRealX = realX - _nextProjectile.position.x;
     int offRealY = realY - _nextProjectile.position.y;
@@ -369,7 +391,13 @@
       [CCCallBlock actionWithBlock:^{
          // OK to add now - rotation is finished!
          [self addChild:_nextProjectile];
-         [_projectiles addObject:_nextProjectile];
+         if (gunType == Shotgun && secondProjectile != nil && thirdProjectile != nil) {
+             [self addChild:secondProjectile];
+             [self addChild:thirdProjectile];
+             [_projectiles addObject:_nextProjectile];
+             [_projectiles addObject:secondProjectile];
+             [_projectiles addObject:thirdProjectile];
+         }
          // Release
          _nextProjectile = nil;
      }],
@@ -381,12 +409,35 @@
       [CCMoveTo actionWithDuration:realMoveDuration position:realDest],
       [CCCallBlockN actionWithBlock:^(CCNode *node) {
          [_projectiles removeObject:node];
-         _comboCounter = 0;
-         [_comboLabel setString:[NSString stringWithFormat: @"Combo: x%d", _comboCounter]];
+         [self resetComboCounter];
          [node removeFromParentAndCleanup:YES];
      }],
       nil]];
     
+    if (gunType == Shotgun && secondProjectile != nil && thirdProjectile != nil) {
+
+        // Move projectile to actual endpoint
+        [secondProjectile runAction:
+         [CCSequence actions:
+          [CCMoveTo actionWithDuration:realMoveDuration position:realDest2],
+          [CCCallBlockN actionWithBlock:^(CCNode *node) {
+             [_projectiles removeObject:node];
+             [self resetComboCounter];
+             [node removeFromParentAndCleanup:YES];
+         }],
+          nil]];
+        
+        // Move projectile to actual endpoint
+        [thirdProjectile runAction:
+         [CCSequence actions:
+          [CCMoveTo actionWithDuration:realMoveDuration position:realDest3],
+          [CCCallBlockN actionWithBlock:^(CCNode *node) {
+             [_projectiles removeObject:node];
+             [self resetComboCounter];
+             [node removeFromParentAndCleanup:YES];
+         }],
+          nil]];
+    }
     _nextProjectile.tag = 2;
     [_projectiles addObject:_nextProjectile];
     
@@ -475,6 +526,8 @@
         } else if (gunBonusesToDelete.count > 0) {
             [projectilesToDelete addObject:projectile];
             [[SimpleAudioEngine sharedEngine] playEffect:@"d9271e_New_Super_Mario_Bros_Coin_Sound_Effect.mp3"];
+            gunType = Shotgun;
+            [[LevelManager sharedManager] loadAmmo:15];
         }
     }
     
@@ -482,6 +535,11 @@
         [_projectiles removeObject:projectile];
         [self removeChild:projectile cleanup:YES];
     }
+}
+
+-(void) resetComboCounter {
+    _comboCounter = 0;
+    [_comboLabel setString:[NSString stringWithFormat: @"Combo: x%d", _comboCounter]];
 }
 
 

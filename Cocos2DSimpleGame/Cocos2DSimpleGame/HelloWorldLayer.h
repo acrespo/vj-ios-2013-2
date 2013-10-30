@@ -13,6 +13,12 @@
 #import "cocos2d.h"
 #import "Level.h"
 
+typedef enum GunType : NSUInteger {
+    Shotgun,
+    Pistol,
+    Uzi
+} GunType;
+
 // HelloWorldLayer
 @interface HelloWorldLayer : CCLayerColor
 {
@@ -41,7 +47,8 @@
     NSSet* _lastTouches;
     float _reloadTime;
     float _reloadCount;
-
+    GunType gunType;
+    NSMutableDictionary *projectilesHitAnything;
 }
 @property Level* level;
 @property int lives;

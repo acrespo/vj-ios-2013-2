@@ -164,6 +164,7 @@
 		8F3CC52E17F4F9F1004F5C24 /* ButtonStar.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F3CC52217F4F9F1004F5C24 /* ButtonStar.png */; };
 		8F3CC52F17F4F9F1004F5C24 /* ButtonStarSel.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F3CC52317F4F9F1004F5C24 /* ButtonStarSel.png */; };
 		8F3DA37E18073C8E0015DB95 /* 16bitEnemySprites_Crouch_v11.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8F3DA37D18073C8E0015DB95 /* 16bitEnemySprites_Crouch_v11.gif */; };
+		8F4BFA0B1821B3B2006B0B73 /* gun-cocking-01.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 8F4BFA0A1821B3B2006B0B73 /* gun-cocking-01.mp3 */; };
 		8F4FD26417FE10400049AF12 /* player2-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F4FD26017FE103F0049AF12 /* player2-hd.png */; };
 		8F4FD26517FE10400049AF12 /* player2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F4FD26117FE103F0049AF12 /* player2.png */; };
 		8F4FD26617FE10400049AF12 /* projectile2-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F4FD26217FE10400049AF12 /* projectile2-hd.png */; };
@@ -485,6 +486,7 @@
 		8F3CC52217F4F9F1004F5C24 /* ButtonStar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ButtonStar.png; sourceTree = "<group>"; };
 		8F3CC52317F4F9F1004F5C24 /* ButtonStarSel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ButtonStarSel.png; sourceTree = "<group>"; };
 		8F3DA37D18073C8E0015DB95 /* 16bitEnemySprites_Crouch_v11.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = 16bitEnemySprites_Crouch_v11.gif; sourceTree = "<group>"; };
+		8F4BFA0A1821B3B2006B0B73 /* gun-cocking-01.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "gun-cocking-01.mp3"; sourceTree = "<group>"; };
 		8F4FD26017FE103F0049AF12 /* player2-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "player2-hd.png"; sourceTree = "<group>"; };
 		8F4FD26117FE103F0049AF12 /* player2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = player2.png; sourceTree = "<group>"; };
 		8F4FD26217FE10400049AF12 /* projectile2-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "projectile2-hd.png"; sourceTree = "<group>"; };
@@ -1014,6 +1016,7 @@
 		35DC325B1653184500862E62 /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				8F4BFA0A1821B3B2006B0B73 /* gun-cocking-01.mp3 */,
 				8F4FD27417FE2C1C0049AF12 /* d9271e_New_Super_Mario_Bros_Coin_Sound_Effect.mp3 */,
 				8F4FD27217FE2B880049AF12 /* 3fc83f_Super_Mario_Bros_1_Up_Sound_Effect.mp3 */,
 				8F4FD27017FE2A360049AF12 /* 3b0817_New_Super_Mario_Bros_Firework_Sound_Effect.mp3 */,
@@ -1128,6 +1131,7 @@
 				8F2319861819BDE5005D0A06 /* demonAnim.plist in Resources */,
 				8F2319881819BE40005D0A06 /* demonAnim.png in Resources */,
 				8F23198A1819EC4F005D0A06 /* shotgun.png in Resources */,
+				8F4BFA0B1821B3B2006B0B73 /* gun-cocking-01.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
