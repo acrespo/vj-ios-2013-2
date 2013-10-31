@@ -180,7 +180,6 @@
         _reloadTime = 0.2f;
         
         [self schedule:@selector(gameLogic:) interval:[LevelManager sharedManager].curLevel.secsPerSpawn];
-        
         [self setTouchEnabled:YES];
                 
         _monsters = [[NSMutableArray alloc] init];
@@ -195,10 +194,7 @@
         _monstersInLevel = _level.enemiesNum;
 
         NSString* enemyCountMessage = [NSString stringWithFormat: @"Enemies killed %d/%d", _monstersDestroyed, _monstersInLevel];
-        _enemyCountLabel = [CCLabelTTF labelWithString:enemyCountMessage fontName:@"Arial" fontSize:28];
-        _enemyCountLabel.color = ccc3(0,0,0);
-        _enemyCountLabel.position = ccp(winSize.width/2, winSize.height/2);
-        [self addChild:_enemyCountLabel];
+        [self showLabel:_enemyCountLabel at:ccp(winSize.width/2, winSize.height/2) withMessage:enemyCountMessage fontSize:28];
         
         NSString* levelMessage = [NSString stringWithFormat: @"Level %d", _level.levelNum];
         _levelLabel = [CCLabelTTF labelWithString:levelMessage fontName:@"Arial" fontSize:28];
@@ -292,6 +288,13 @@
         gunType = Pistol;
     }
     return self;
+}
+
+-(void)showLabel:(CCLabelTTF*)label at:(CGPoint)point withMessage:(NSString*)message fontSize:(int)fontSize {
+    label = [CCLabelTTF labelWithString:message fontName:@"Arial" fontSize:28];
+    label.color = ccc3(0,0,0);
+    label.position = point;
+    [self addChild:label];
 }
 
 - (void)unpauseButtonTapped:(id)sender {
