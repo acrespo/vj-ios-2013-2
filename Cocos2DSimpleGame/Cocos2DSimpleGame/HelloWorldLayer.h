@@ -36,7 +36,9 @@ typedef enum GunType : NSUInteger {
     CCLabelTTF * _comboLabel;
     CCLabelTTF * _pauseLabel;
     CCLabelTTF * _ammoLabel;
-    CCMenuItem * _starMenuItem;
+    CCMenuItem * _pauseMenuItem;
+    CCMenuItem * _restartMenuItem;
+    CCMenuItem * _godModeMenuItem;
     CCMenuItem * _nextLevelMenuItem;
     CGSize winSize;
     CCSprite *_player;

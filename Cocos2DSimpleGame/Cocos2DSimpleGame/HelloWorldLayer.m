@@ -62,6 +62,7 @@
     [_monsters removeObject:node];
     [node removeFromParentAndCleanup:YES];
     
+    if ([LevelManager sharedManager].godMode)  return;
     _lives--;
     if (_lives < 0) {
         [self nextSceneWithWon:NO];
@@ -210,26 +211,38 @@
         
         
         // Standard method to create a button
-        _starMenuItem = [CCMenuItemImage
+        _pauseMenuItem = [CCMenuItemImage
                                     itemWithNormalImage:@"ButtonStar.png" selectedImage:@"ButtonStarSel.png"
                                     target:self selector:@selector(pauseButtonTapped:)];
-        _starMenuItem.scale = 0.5;
-        _starMenuItem.position = ccp(winSize.width-_starMenuItem.boundingBox.size.width/2, _starMenuItem.boundingBox.size.height/2);
+        _pauseMenuItem.scale = 0.5;
+        _pauseMenuItem.position = ccp(winSize.width-_pauseMenuItem.boundingBox.size.width/2, _pauseMenuItem.boundingBox.size.height/2);
 
         _nextLevelMenuItem = [CCMenuItemImage
                          itemWithNormalImage:@"ButtonPlus.png" selectedImage:@"ButtonPlusSel.png"
                          target:self selector:@selector(nextLevel:)];
         _nextLevelMenuItem.scale = 0.5;
-        _nextLevelMenuItem.position = ccp(winSize.width-_nextLevelMenuItem.boundingBox.size.width/2, _nextLevelMenuItem.boundingBox.size.height/2 + _starMenuItem.boundingBox.size.height);
+        _nextLevelMenuItem.position = ccp(winSize.width-_nextLevelMenuItem.boundingBox.size.width/2, _nextLevelMenuItem.boundingBox.size.height/2 + _pauseMenuItem.boundingBox.size.height);
 
-        CCMenu *starMenu = [CCMenu menuWithItems:_starMenuItem, _nextLevelMenuItem, nil];
+        _restartMenuItem = [CCMenuItemImage
+                          itemWithNormalImage:@"Button1.png" selectedImage:@"Button1Sel.png"
+                          target:self selector:@selector(restartLevel:)];
+        _restartMenuItem.scale = 0.5;
+        _restartMenuItem.position = ccp(winSize.width-_restartMenuItem.boundingBox.size.width*2, _restartMenuItem.boundingBox.size.height/2 + _pauseMenuItem.boundingBox.size.height);
+        
+        _godModeMenuItem = [CCMenuItemImage
+                            itemWithNormalImage:@"Button2.png" selectedImage:@"Button2Sel.png"
+                            target:self selector:@selector(godMode:)];
+        _godModeMenuItem.scale = 0.5;
+        _godModeMenuItem.position = ccp(winSize.width-_godModeMenuItem.boundingBox.size.width*3, _godModeMenuItem.boundingBox.size.height/2 + _pauseMenuItem.boundingBox.size.height);
+        
+        CCMenu *starMenu = [CCMenu menuWithItems:_pauseMenuItem, _nextLevelMenuItem, _godModeMenuItem, _restartMenuItem, nil];
         starMenu.position = CGPointZero;
         [self addChild:starMenu];
         
         NSString* pauseMenuMessage = [NSString stringWithFormat: @"Pause"];
         _pauseLabel = [CCLabelTTF labelWithString:pauseMenuMessage fontName:@"Arial" fontSize:28];
         _pauseLabel.color = ccc3(0,0,0);
-        _pauseLabel.position = ccp(winSize.width - _starMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2);
+        _pauseLabel.position = ccp(winSize.width - _pauseMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2);
         [self addChild:_pauseLabel];
         
         CCParticleSystem* p = [_level getParticleSystem];
@@ -299,18 +312,27 @@
 
 - (void)unpauseButtonTapped:(id)sender {
     [_pauseLabel setString:@"Pause"];
-    [_pauseLabel setPosition:ccp(winSize.width - _starMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
+    [_pauseLabel setPosition:ccp(winSize.width - _pauseMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
     [CCDirector sharedDirector].scheduler.timeScale = 1;
-    [_starMenuItem setTarget:self selector:@selector(pauseButtonTapped:)];
+    [_pauseMenuItem setTarget:self selector:@selector(pauseButtonTapped:)];
 }
 
 
 - (void)pauseButtonTapped:(id)sender {
     [_pauseLabel setString:@"Resume"];
-    [_pauseLabel setPosition:ccp(winSize.width - _starMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
+    [_pauseLabel setPosition:ccp(winSize.width - _pauseMenuItem.boundingBox.size.width - _pauseLabel.contentSize.width/2, _pauseLabel.contentSize.height/2)];
     [CCDirector sharedDirector].scheduler.timeScale = 0;
-    [_starMenuItem setTarget:self selector:@selector(unpauseButtonTapped:)];
+    [_pauseMenuItem setTarget:self selector:@selector(unpauseButtonTapped:)];
+}
 
+- (void) restartLevel:(id)sender {
+    CCScene *gameOverScene = [HelloWorldLayer scene];
+    [CCDirector sharedDirector].scheduler.timeScale = 1;
+    [[CCDirector sharedDirector] replaceScene:gameOverScene];
+}
+
+- (void) godMode:(id)sender {
+    [LevelManager sharedManager].godMode = ![LevelManager sharedManager].godMode;
 }
 
 - (void)nextLevel:(id)sender {

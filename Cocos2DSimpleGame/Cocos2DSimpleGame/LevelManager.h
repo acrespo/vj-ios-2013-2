@@ -19,7 +19,7 @@
 @property CGSize winSize;
 @property int ammo;
 @property int shotgunMaxAmmo;
-
+@property bool godMode;
 
 + (LevelManager*)sharedManager;
 - (Level *)curLevel;
