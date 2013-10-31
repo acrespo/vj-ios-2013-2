@@ -262,6 +262,15 @@
         
         [_livesLabel setString: [NSString stringWithFormat: @"Lives %d", _lives]];
         
+        NSString* ammoMessage = [NSString stringWithFormat: @"Ammo: %d", [LevelManager sharedManager].ammo];
+        _ammoLabel = [CCLabelTTF labelWithString:ammoMessage fontName:@"Arial" fontSize:12];
+        _ammoLabel.color = ccc3(0,0,0);
+        _ammoLabel.position = ccp(winSize.width/2 - _ammoLabel.contentSize.width, winSize.height - _ammoLabel.contentSize.height*2);
+        [self addChild:_ammoLabel];
+        if ([LevelManager sharedManager].ammo <= 0) {
+            _ammoLabel.visible = false;
+        }
+        
         [self schedule:@selector(update:)];
         
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"demonAnim.plist"];
@@ -367,7 +376,13 @@
         thirdProjectile = [CCSprite spriteWithFile:@"projectile.png" rect:CGRectMake(0, 0, 20, 20)];
         thirdProjectile.position = ccp(20, winSize.height/2);
         [[LevelManager sharedManager] reduceAmmo:3];
-        
+        if ([LevelManager sharedManager].ammo > 0) {
+            _ammoLabel.visible = true;
+            [_ammoLabel setString: [NSString stringWithFormat: @"Ammo: %d", [LevelManager sharedManager].ammo]];
+        } else {
+            _ammoLabel.visible = false;
+
+        }
     }
     
 
@@ -528,6 +543,10 @@
             [[SimpleAudioEngine sharedEngine] playEffect:@"d9271e_New_Super_Mario_Bros_Coin_Sound_Effect.mp3"];
             gunType = Shotgun;
             [[LevelManager sharedManager] loadAmmo:15];
+            if ([LevelManager sharedManager].ammo > 0) {
+                _ammoLabel.visible = true;
+                [_ammoLabel setString: [NSString stringWithFormat: @"Ammo: %d", [LevelManager sharedManager].ammo]];
+            }
         }
     }
     
