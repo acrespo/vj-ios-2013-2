@@ -8,10 +8,14 @@
 
 #import "cocos2d.h"
 #import "Graph.h"
-#import "HudLayer.h"
 #import "ObjectiveChipmunk.h"
 
 @class Player;
+@class HudLayer;
+
+#define LAYER_TERRAIN_ONLY  1
+#define LAYER_TERRAIN       2
+#define LAYER_UNITS         4
 
 @interface GameLayer : CCLayerColor {
 
@@ -22,6 +26,8 @@
     Graph* _graph;
     
     NSMutableArray *_enemies;
+    NSMutableArray *_projectiles;
+
     CCSpriteBatchNode *_enemyBatch;
 
     HudLayer *_hud;
@@ -29,12 +35,17 @@
 
     BOOL _mouseDown;
     CGPoint _mousePos;
+    
+    float _nextWaveTime;
 }
 
 @property float time;
 @property (strong) CCTMXTiledMap *tileMap;
 @property (nonatomic, strong) ChipmunkSpace *space;
 @property (nonatomic, strong) Player *player;
+@property (assign) int mode;
+@property (strong) NSString *borderType;
+@property bool stillAlive;
 
 + (CCScene *)scene;
 

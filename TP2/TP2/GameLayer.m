@@ -7,6 +7,8 @@
 //
 
 #import "GameLayer.h"
+#import "GameOverLayer.h"
+#import"HelloWorldLayer2.h"
 #import "AppDelegate.h"
 #import "GameObject.h"
 #import "Player.h"
@@ -16,6 +18,8 @@
 #import "ObjectiveChipmunk.h"
 #import "ChipmunkAutoGeometry.h"
 #import "Enemy.h"
+#import "HudLayer.h"
+#import "LevelManager.h"
 
 @implementation GameLayer
 
@@ -23,15 +27,14 @@
     CCScene *scene = [CCScene node];
     GameLayer *layer = [GameLayer node];
     
-    // add layer as a child to scene
     [scene addChild: layer];
-    
-    
+
     HudLayer *hud = [HudLayer node];
     [scene addChild:hud];
     layer->_hud = hud;
     
-    // return the scene
+    hud.gameLayer = layer;
+    
     return scene;
 }
 
@@ -39,13 +42,10 @@
     self = [super initWithColor:ccc4(255,255,255,255)];
     
     if (self != nil) {
-        CGSize winSize = [CCDirector sharedDirector].winSize;
         
-        // At top of init for HelloWorldLayer
         [[SimpleAudioEngine sharedEngine] preloadEffect:@"pickup.caf"];
         [[SimpleAudioEngine sharedEngine] preloadEffect:@"hit.caf"];
-        [[SimpleAudioEngine sharedEngine] preloadEffect:@"move.caf"];
-        [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"TileMap.caf"];
+//        [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"TileMap.caf"];
         
         _tileMap = [CCTMXTiledMap tiledMapWithTMXFile:@"TileMap.tmx"];
         [self addChild:_tileMap];
@@ -53,28 +53,48 @@
         _foreground = [_tileMap layerNamed:@"Foreground"];
         
         _meta = [_tileMap layerNamed:@"Meta"];
-//        _meta.visible = NO;
-        
+        _meta.visible = NO;
         
         _space = [[ChipmunkSpace alloc] init];
+        _borderType = @"borderType";
+        
+        CGSize winSize = [[CCDirector sharedDirector] winSize];
+        CGRectMake(0, 0, _tileMap.mapSize.width, _tileMap.mapSize.height);
+        [_space addBounds:CGRectMake(0, 0, _tileMap.mapSize.width*_tileMap.tileSize.width-15, _tileMap.mapSize.height*_tileMap.tileSize.height-15)
+               thickness:10.0f
+              elasticity:1.0f friction:1.0f
+                  layers:LAYER_UNITS | LAYER_TERRAIN | LAYER_TERRAIN_ONLY group:CP_NO_GROUP
+           collisionType:_borderType
+         ];
+        
+        [_space addCollisionHandler:self
+                             typeA:[Player class] typeB:_borderType
+                             begin:@selector(beginCollision:space:)
+                          preSolve:nil
+                         postSolve:@selector(postSolveCollision:space:)
+                          separate:@selector(separateCollision:space:)
+         ];
+        
+        [_space addCollisionHandler:self
+                              typeA:[Player class] typeB:[Enemy class]
+                              begin:@selector(beginCollision:space:)
+                           preSolve:nil
+                          postSolve:@selector(postSolveCollision:space:)
+                           separate:@selector(separateCollision:space:)
+         ];
         
         // Add a CCPhysicsDebugNode to draw the space.
         CCPhysicsDebugNode *debugNode = [CCPhysicsDebugNode debugNodeForChipmunkSpace:_space];
         [self addChild:debugNode];
         
-        
-        // create the player
         _player = [[Player alloc] initWithLayer:self];
+        _stillAlive = true;
         [self addChild:_player];
-
-        
-        // init the game object arrays
         _enemies = [[NSMutableArray alloc] init];
-        
-        // set the intervals
+        _projectiles = [[NSMutableArray alloc] init];
+
         [self schedule:@selector(update:)];
-        
-        // enable touch
+        [self schedule:@selector(testCollisions:)];
         [self setTouchEnabled:YES];
         
         CCTMXObjectGroup *objectGroup = [_tileMap objectGroupNamed:@"Objects"];
@@ -92,17 +112,18 @@
         _player.chipmunkBody.pos = ccp(x,y);
         [self setViewPointCenter:_player.position];
         _graph = [[Graph alloc] initWithMap:_tileMap];
+        CCLOG(@"%f,%f", _player.position.x, _player.position.y);
+
         
-        MyDebugRenderer* renderer = [[MyDebugRenderer alloc] initWithGraph:_graph tileSize:_tileMap.tileSize];
-        [self addChild:renderer];
+//        MyDebugRenderer* renderer = [[MyDebugRenderer alloc] initWithGraph:_graph tileSize:_tileMap.tileSize];
+//        [self addChild:renderer];
         self.touchEnabled = YES;
         
         [self createTerrainGeometry];
-        // add some crates, it's not a video game without crates!
-        for(int i=0; i<16; i++){
-            float dist = 50.0f;
-            [self makeBoxAtX: x + (i % 4) * dist + 200 y: y + ( i / 4) * dist - 200];
-        }
+//        for(int i=0; i<16; i++){
+//            float dist = 50.0f;
+//            [self makeBoxAtX: x + (i % 4) * dist + 200 y: y + ( i / 4) * dist - 200];
+//        }
         
         for (spawnPoint in [objectGroup objects]) {
             if ([[spawnPoint valueForKey:@"Enemy"] intValue] == 1){
@@ -112,6 +133,7 @@
             }
         }
         
+        _nextWaveTime = 0;
     }
     
     return self;
@@ -137,16 +159,11 @@
     touchLocation = [[CCDirector sharedDirector] convertToGL:touchLocation];
     touchLocation = [self convertToNodeSpace:touchLocation];
     
-    CGPoint playerPos = _player.position;
-    
-    NSMutableArray* path = [self findPathFrom:playerPos to:touchLocation];
-    
-    [_graph printPath:path];
-    [_player setPath:path];
-    
-//    CCLOG(@"playerPos %@",CGPointCreateDictionaryRepresentation(playerPos));
-    [self setViewPointCenter:_player.position];
-    
+    if (_mode == 0) {
+        [self movePlayer:touchLocation];
+    } else {
+        [self shoot:touchLocation];
+    }    
 }
 
 - (void)update:(ccTime)dt {
@@ -170,6 +187,22 @@
             [self removeChild:gameObject cleanup:YES];
         }
     }
+    _nextWaveTime +=dt;
+    
+    if (_nextWaveTime >= [LevelManager sharedManager].curLevel.secsPerSpawn && [LevelManager sharedManager].curLevel.enemiesSpawned < [LevelManager sharedManager].curLevel.enemiesNum) {
+        int x;
+        int y;
+        CCTMXObjectGroup *objectGroup = [_tileMap objectGroupNamed:@"Objects"];
+        for (NSDictionary* spawnPoint in [objectGroup objects]) {
+            if ([[spawnPoint valueForKey:@"Enemy"] intValue] == 1){
+                x = [[spawnPoint valueForKey:@"x"] intValue];
+                y = [[spawnPoint valueForKey:@"y"] intValue];
+                [self addEnemyAtX:x y:y];
+            }
+        }
+        _nextWaveTime = 0;
+    }
+    
     [_space step:dt];
 }
 
@@ -184,10 +217,111 @@
 //        CCLOG(@"destCoordinate %@",CGPointCreateDictionaryRepresentation(destCoordinate));
         to = [[Node alloc] initWith:destCoordinate];
     }
+    NSArray* path = [_graph findPathFrom:from to:to];
+    NSMutableArray* betterPath = [NSMutableArray array];
     
-    return [_graph findPathFrom:from to:to];
+    Node* start = path[0];
+    Node* prev = path[0];
+    Node* current;
+    for (Node *node in path) {
+        
+        current = node;
+        CGPoint from = [self positionForTileCoord:[start getCoordinates]];
+        CGPoint to =[self positionForTileCoord:[current getCoordinates]];
+        NSArray* hitObjects = [_space segmentQueryAllFrom:from to:to layers:LAYER_TERRAIN_ONLY group:CP_NO_GROUP];
+        
+        if ([hitObjects count] > 0) {
+            [betterPath addObject:prev];
+            start = prev;
+        }
+        prev = current;
+    }
+    [betterPath addObject:current];
+    return betterPath;
 }
+
+
 /* Private methods */
+
+-(void) movePlayer:(CGPoint) touchLocation {
+    CGPoint playerPos = _player.position;
+    NSMutableArray* path = [self findPathFrom:playerPos to:touchLocation];
+    
+    //[_graph printPath:path];
+    [_player setPath:path];
+    
+    //    CCLOG(@"playerPos %@",CGPointCreateDictionaryRepresentation(playerPos));
+    [self setViewPointCenter:_player.position];
+}
+
+-(void) shoot:(CGPoint) touchLocation {
+    CCSprite *projectile = [CCSprite spriteWithFile:@"Projectile.png"];
+    projectile.position = _player.position;
+    [self addChild:projectile];
+    
+    int width = _tileMap.mapSize.width * _tileMap.tileSize.width;
+    int height = _tileMap.mapSize.height * _tileMap.tileSize.height;
+    int realX;
+    
+    // Are we shooting to the left or right?
+    CGPoint diff = ccpSub(touchLocation, _player.position);
+    if (diff.x > 0) {
+        realX = (_tileMap.mapSize.width * _tileMap.tileSize.width) -
+        (projectile.contentSize.width/2);
+    } else {
+        realX = (projectile.contentSize.width/2);
+    }
+    float ratio = (float) diff.y / (float) diff.x;
+    int realY = ((realX - projectile.position.x) * ratio) + projectile.position.y;
+
+    CCLOG(@"ratio %f - abd %f", ratio, fabs(ratio));
+    if (realY > height) {
+        float a = realY - height;
+        float b = a / fabs(ratio);
+        if (diff.x > 0) {
+            realX -= b;
+        } else {
+            realX += b;
+        }
+        realY = height - (projectile.contentSize.width/2);
+    } else if (realY < 0){
+        float a = fabs(realY);
+        float b = a / fabs(ratio);
+        if (diff.x > 0) {
+            realX -= b;
+        } else {
+            realX += b;
+        }
+        realY = (projectile.contentSize.width/2);
+    }
+    
+    CGPoint realDest = ccp(realX, realY);
+    
+    // Determine the length of how far we're shooting
+    int offRealX = realX - projectile.position.x;
+    int offRealY = realY - projectile.position.y;
+    float length = sqrtf((offRealX*offRealX) + (offRealY*offRealY));
+    float velocity = 480/1; // 480pixels/1sec
+    float realMoveDuration = length/velocity;
+    
+    CCLOG(@"world size %d,%d", width, height);
+    if (realDest.x < 0 || realDest.x >= width || realDest.y < 0 || realDest.y >= height) {
+        CCLOG(@"AND ITS A HOMERUNM!!!!");
+    }
+    
+    CCLOG(@"realdest %f,%f", realDest.x, realDest.y);
+    CGPoint realDest2 = [self tileCoordForPosition:realDest];
+    CCLOG(@"realdest %f,%f", realDest2.x, realDest2.y);
+    
+    id actionMoveDone = [CCCallFuncN actionWithTarget:self
+                                             selector:@selector(projectileMoveFinished:)];
+    [projectile runAction:
+     [CCSequence actionOne:
+      [CCMoveTo actionWithDuration: realMoveDuration
+                          position: realDest]
+                       two: actionMoveDone]];
+    [_projectiles addObject:projectile];
+}
 
 -(void)setPlayerPosition:(CGPoint)position {
 	
@@ -215,7 +349,7 @@
             }
         }
     }
-    [[SimpleAudioEngine sharedEngine] playEffect:@"move.caf"];
+//    [[SimpleAudioEngine sharedEngine] playEffect:@"move.caf"];
     _player.position = position;
 }
 
@@ -235,6 +369,10 @@
     return ccp(floor(position.x/_tileMap.tileSize.width), floor(position.y/_tileMap.tileSize.height));
 }
 
+-(CGPoint) positionForTileCoord:(CGPoint)tileCoord {
+    return ccp(tileCoord.x * _tileMap.tileSize.width+_tileMap.tileSize.width/2, tileCoord.y * _tileMap.tileSize.height+_tileMap.tileSize.height/2);
+}
+
 - (void)setViewPointCenter:(CGPoint) position {
     
     CGSize winSize = [CCDirector sharedDirector].winSize;
@@ -250,9 +388,67 @@
     self.position = viewPoint;
 }
 
-- (void)win {
-    //CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES];
-    //[[CCDirector sharedDirector] replaceScene:gameOverScene];
+- (void)testCollisions:(ccTime)dt {
+    
+    NSMutableArray *projectilesToDelete = [[NSMutableArray alloc] init];
+    
+    for (CCSprite *projectile in _projectiles) {
+        CGRect projectileRect = CGRectMake(
+                                           projectile.position.x - (projectile.contentSize.width/2),
+                                           projectile.position.y - (projectile.contentSize.height/2),
+                                           projectile.contentSize.width,
+                                           projectile.contentSize.height);
+        
+        NSMutableArray *targetsToDelete = [[NSMutableArray alloc] init];
+        
+        for (Enemy *target in _enemies) {
+            CGRect targetRect = CGRectMake(
+                                           target.position.x - (target.contentSize.width/2),
+                                           target.position.y - (target.contentSize.height/2),
+                                           target.contentSize.width,
+                                           target.contentSize.height);
+            
+            if (CGRectIntersectsRect(projectileRect, targetRect)) {
+                [targetsToDelete addObject:target];
+                [LevelManager sharedManager].curLevel.enemiesKilled++;
+                [_hud updateEnemyCounter:[LevelManager sharedManager].curLevel.enemiesKilled];
+                if ([LevelManager sharedManager].curLevel.enemiesKilled >= [LevelManager sharedManager].curLevel.enemiesNum) {
+                    [self gameOver:true];
+                }
+            }
+        }
+        
+        for (Enemy *target in targetsToDelete) {
+            [_enemies removeObject:target];
+            [_space remove:target.chipmunkBody];
+            [_space remove:target.shape];
+            [self removeChild:target cleanup:YES];
+        }
+        
+        bool wallHit = false;
+        
+        CGPoint tileCoord = [self tileCoordForPosition:projectile.position];
+        tileCoord = ccp(tileCoord.x, _tileMap.mapSize.height - 1 - tileCoord.y);
+        int tileGid = [_meta tileGIDAt:tileCoord];
+        if (tileGid) {
+            NSDictionary *properties = [_tileMap propertiesForGID:tileGid];
+            if (properties) {
+                NSString *collision = properties[@"Collidable"];
+                if (collision && [collision isEqualToString:@"True"]) {
+                    [[SimpleAudioEngine sharedEngine] playEffect:@"hit.caf"];
+                    wallHit = true;
+                }
+            }
+        }
+        if (targetsToDelete.count > 0 || wallHit) {
+            [projectilesToDelete addObject:projectile];
+        }
+    }
+    
+    for (CCSprite *projectile in projectilesToDelete) {
+        [_projectiles removeObject:projectile];
+        [self removeChild:projectile cleanup:YES];
+    }
 }
 
 - (void)createTerrainGeometry
@@ -289,27 +485,28 @@
             
             ChipmunkShape *seg = [_space add:[ChipmunkSegmentShape segmentWithBody:_space.staticBody from:a to:b radius:1.0f]];
             seg.friction = 1.0;
+            seg.layers = LAYER_TERRAIN_ONLY | LAYER_TERRAIN;
         }
     }
     
     // add left wall
     ChipmunkShape *segLeft = [ChipmunkSegmentShape segmentWithBody:_space.staticBody from:cpv(0, 0) to:cpv(0, tileCountH * tileSize) radius:1.0f];
-//    segLeft.layers = COLLISION_TERRAIN_ONLY | COLLISION_TERRAIN;
+    segLeft.layers = LAYER_TERRAIN_ONLY | LAYER_TERRAIN;
     [_space add:segLeft];
     
     // add top wall
     ChipmunkShape *segTop = [ChipmunkSegmentShape segmentWithBody:_space.staticBody from:cpv(0, tileCountH * tileSize) to:cpv(tileCountW * tileSize, tileCountH * tileSize) radius:1.0f];
-//    segTop.layers = COLLISION_TERRAIN_ONLY | COLLISION_TERRAIN;
+    segLeft.layers = LAYER_TERRAIN_ONLY | LAYER_TERRAIN;
     [_space add:segTop];
     
     // add right wall
     ChipmunkShape *segRight = [ChipmunkSegmentShape segmentWithBody:_space.staticBody from:cpv(tileCountW * tileSize, tileCountH * tileSize) to:cpv(tileCountW * tileSize, 0) radius:1.0f];
-//    segRight.layers = COLLISION_TERRAIN_ONLY | COLLISION_TERRAIN;
+    segLeft.layers = LAYER_TERRAIN_ONLY | LAYER_TERRAIN;
     [_space add:segRight];
     
     // add bottom wall
     ChipmunkShape *segBottom = [ChipmunkSegmentShape segmentWithBody:_space.staticBody from:cpv(tileCountW * tileSize, 0) to:cpv(0, 0) radius:1.0f];
-//    segBottom.layers = COLLISION_TERRAIN_ONLY | COLLISION_TERRAIN;
+    segLeft.layers = LAYER_TERRAIN_ONLY | LAYER_TERRAIN;
     [_space add:segBottom];
 }
 
@@ -346,13 +543,61 @@
 }
 
 -(void)addEnemyAtX:(int)x y:(int)y {
-//    CCSprite *enemy = [CCSprite spriteWithFile:@"enemy1.png"];
-    Enemy *enemy = [[Enemy alloc ] initWithLayer:self];
-    enemy.position = ccp(x, y);
+
+    if ([LevelManager sharedManager].curLevel.enemiesSpawned < [LevelManager sharedManager].curLevel.enemiesNum) {
+        Enemy *enemy = [[Enemy alloc ] initWithLayer:self];
+        enemy.position = ccp(x, y);
     
-    [_enemies addObject:enemy];
+        [_enemies addObject:enemy];
+        [LevelManager sharedManager].curLevel.enemiesSpawned++;
+        [self addChild:enemy];
+    }
+}
+
+- (bool)beginCollision:(cpArbiter*)arbiter space:(ChipmunkSpace*)space {
+    CHIPMUNK_ARBITER_GET_SHAPES(arbiter, playerShape, otherShape);
     
-    [self addChild:enemy];
+    if (_stillAlive) {
+        Player* player = playerShape.data;
+    
+        if ([otherShape.data isMemberOfClass:[Enemy class]]) {
+            if (![LevelManager sharedManager].godMode) {
+                _stillAlive = false;
+                [[SimpleAudioEngine sharedEngine] playEffect:@"Sound Effects - Death Screams.mp3"];
+                [self gameOver:false];
+            }
+        }
+        CCLOG(@"collision!!! %@", player.name);
+        [[SimpleAudioEngine sharedEngine] playEffect:@"hit.caf"];
+        return TRUE;
+    } else {
+        return false;
+    }
+}
+
+- (void)separateCollision:(cpArbiter*)arbiter space:(ChipmunkSpace*)space {
+    CHIPMUNK_ARBITER_GET_SHAPES(arbiter, buttonShape, border);
+}
+
+- (void)postSolveCollision:(cpArbiter*)arbiter space:(ChipmunkSpace*)space {
+    if(!cpArbiterIsFirstContact(arbiter)) return;
+    
+    cpFloat impulse = cpvlength(cpArbiterTotalImpulse(arbiter));
+    
+    float volume = MIN(impulse/500.0f, 1.0f);
+    if(volume > 0.05f){
+//        [SimpleSound playSoundWithVolume:volume];
+    }
+}
+
+- (void) projectileMoveFinished:(id)sender {
+    CCSprite *sprite = (CCSprite *)sender;
+    [self removeChild:sprite cleanup:YES];
+    [_projectiles removeObject:sprite];
+}
+
+- (void) gameOver:(bool)won {
+    [[CCDirector sharedDirector] replaceScene:[CCTransitionFade transitionWithDuration:1.0 scene:[GameOverLayer sceneWithWon:won caller:self]]];
 }
 
 @end

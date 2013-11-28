@@ -8,6 +8,7 @@
 
 #import "Player.h"
 #import "Graph.h"
+#import "GameLayer.h"
 
 #define FRICTION 0.67f
 
@@ -18,13 +19,17 @@
     
     if (self != nil) {
         _gameLayer = layer;
-        _speed = 1770;
+        _speed = 3000;
+        _name = @"Alvanator";
         float playerMass = 10.0f;
         float playerRadius = 13.0f;
         
         self.chipmunkBody = [layer.space add:[ChipmunkBody bodyWithMass:playerMass andMoment:INFINITY]];
         ChipmunkShape *playerShape = [layer.space add:[ChipmunkCircleShape circleWithBody:self.chipmunkBody radius:playerRadius offset:cpvzero]];
         playerShape.friction = 0.1;
+        playerShape.collisionType = [Player class];
+        playerShape.layers = LAYER_UNITS | LAYER_TERRAIN;
+        playerShape.data = self;
     }
     [self schedule:@selector(update:)];
     
@@ -50,7 +55,7 @@
             [self.chipmunkBody applyForce:ccpMult(dir, _speed * self.chipmunkBody.mass) offset:cpvzero];
         }
         
-        if (ccpFuzzyEqual(self.position, ccp(x,y), 20)) {
+        if (ccpFuzzyEqual(self.position, ccp(x,y), 7)) {
             if ([_path count] > 0) {
                 [_path removeObjectAtIndex:0];
                 if ([_path count] == 0) {

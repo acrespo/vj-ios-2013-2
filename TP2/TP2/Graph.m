@@ -1,4 +1,4 @@
-//
+ //
 //  Graph.m
 //  HalfLife2D
 //
@@ -83,11 +83,14 @@
     NSMutableArray* frontier = [[NSMutableArray alloc] init]; //openList
     Node* lowestNode = nil;
     
+    if (start == nil || start == (id)[NSNull null]) {
+        return closedList;
+    }
     start.g = 0;
-    NSLog(@"%@", start.parent);
+//    NSLog(@"%@", start.parent);
     start.h = [self calcH:start toReach:end];
     if (start.parent != nil)
-    NSLog(@"%d ,%d", start.parent.x, start.parent.y);
+//    NSLog(@"%d ,%d", start.parent.x, start.parent.y);
     start.parent = nil;
     [frontier addObject:start];
     while(lowestNode != end && frontier.count > 0) {

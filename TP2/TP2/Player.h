@@ -14,11 +14,14 @@
 @interface Player : GameObject {
     NSMutableArray* _path;
     GameLayer * _gameLayer;
-    float _speed;
 }
+
+@property (strong)  NSString* name;
+@property float speed;
 
 - (id)initWithLayer:(GameLayer *)layer;
 - (void)update:(ccTime)delta;
 
 -(void)setPath:(NSMutableArray*)path;
+
 @end

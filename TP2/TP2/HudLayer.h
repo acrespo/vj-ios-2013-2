@@ -7,7 +7,20 @@
 //
 
 #import "cocos2d.h"
+#import "GameLayer.h"
+#import "Level.h"
 
-@interface HudLayer : CCLayer
+@interface HudLayer : CCLayerColor
+
+@property (nonatomic) GameLayer * gameLayer;
+@property int monstersDestroyed;
+@property (nonatomic) Level* level;
+@property int lives;
+@property int comboCounter;
+
 - (void)numCollectedChanged:(int)numCollected;
+
+- (void)projectileButtonTapped:(id)sender;
+
+- (void)updateEnemyCounter:(int)num;
 @end

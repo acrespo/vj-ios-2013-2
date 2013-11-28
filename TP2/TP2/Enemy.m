@@ -9,7 +9,7 @@
 #import "Enemy.h"
 #import "Player.h"
 
-#define FRICTION 0.67f
+#define FRICTION 0.77f
 @implementation Enemy
 
 
@@ -18,13 +18,16 @@
     
     if (self != nil) {
         _gameLayer = layer;
-        _speed = 1770;
+        _speed = 3000;
         float enemyMass = 10.0f;
         float enemyRadius = 13.0f;
         
         self.chipmunkBody = [layer.space add:[ChipmunkBody bodyWithMass:enemyMass andMoment:INFINITY]];
-        ChipmunkShape *enemyShape = [layer.space add:[ChipmunkCircleShape circleWithBody:self.chipmunkBody radius:enemyRadius offset:cpvzero]];
-        enemyShape.friction = 0.1;
+        _shape = [layer.space add:[ChipmunkCircleShape circleWithBody:self.chipmunkBody radius:enemyRadius offset:cpvzero]];
+        _shape.friction = 0.1;
+        _shape.collisionType = [Enemy class];
+        _shape.layers = LAYER_UNITS | LAYER_TERRAIN;
+        _shape.data = self;
     }
     [self schedule:@selector(update:)];
     
@@ -35,7 +38,10 @@
 - (void)update:(ccTime)delta {
     [self.chipmunkBody resetForces];
 
-    if (_path != nil) {
+    if (_path == nil || ccpLengthSQ(ccpSub(_lastPlayerPosition, _gameLayer.player.position)) > 1000) {
+        _lastPlayerPosition = _gameLayer.player.position;
+        _path = [_gameLayer findPathFrom:self.position to:_lastPlayerPosition];
+    } else {
         
         Node*  nextTile = [_path objectAtIndex:0];
         
@@ -51,7 +57,7 @@
             [self.chipmunkBody applyForce:ccpMult(dir, _speed * self.chipmunkBody.mass) offset:cpvzero];
         }
         
-        if (ccpFuzzyEqual(self.position, ccp(x,y), 20)) {
+        if (ccpFuzzyEqual(self.position, ccp(x,y), 7)) {
             if ([_path count] > 0) {
                 [_path removeObjectAtIndex:0];
                 if ([_path count] == 0) {
@@ -59,11 +65,7 @@
                 }
             }
         }
-    } else {
-        _path = [_gameLayer findPathFrom:self.position to:_gameLayer.player.position];
     }
-    
     self.chipmunkBody.vel = ccpMult(self.chipmunkBody.vel, FRICTION);
-
 }
 @end

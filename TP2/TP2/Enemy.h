@@ -13,7 +13,10 @@
     NSMutableArray* _path;
     GameLayer * _gameLayer;
     float _speed;
+    CGPoint _lastPlayerPosition;
 }
+
+@property (nonatomic, strong) ChipmunkShape *shape;
 
 - (id)initWithLayer:(GameLayer *)layer;
 @end
